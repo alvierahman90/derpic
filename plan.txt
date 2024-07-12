@@ -1,0 +1,93 @@
+POST /upload?strip_exif=true
+  Description:
+    Upload a photo, optionally (by default) strip all EXIF metadata.
+
+  Request:
+    X-Derpic-Token
+
+    <img binary>
+
+GET /i
+  Description:
+    List all photos user has uploaded.
+
+  Request:
+    X-Derpic-Token
+
+  Response:
+    {
+      "id": 0,
+      "upload_date": "2024-06-24T12:30:08"
+    }
+
+GET /i/<id>.<png|jpeg|webp>?size=1mb&resolution=1920x1080&rotate=90deg
+  Description:
+    Retrieve uploaded photo, (optionally) scaling and resizing image as requested.
+
+  Response: image binary
+
+DELETE /i/<id>
+  Description:
+    Delete a photo by ID.
+    This action is not reversible.
+
+  Request:
+    X-Derpic-Token
+
+  Response:
+    {
+      "id": "string"
+    }
+
+POST /admin/tokens
+  Description:
+    Create a new token (user).
+
+  Request:
+    X-Derpic-Admin-Token
+
+    {
+      "name": "token name"
+    }
+
+  Response:
+    {
+      "token": "string",
+      "name": "token name",
+      "revoked": false,
+      "id": 0
+    }
+
+GET /admin/tokens
+  Description:
+    List all tokens (users).
+
+  Request:
+    X-Derpic-Admin-Token
+
+  Response:
+    [
+      {
+        "token": "string",
+        "name": "token name",
+        "revoked": false,
+        "id": 0
+      },
+      ...
+    ]
+
+DELETE /admin/tokens/<id>?delete_images=false
+  Description:
+    Revoke a token (user) and (optionally) delete their uploaded images.
+    This action is not reversible.
+
+  Request:
+    X-Derpic-Admin-Token
+
+  Response:
+    {
+      "token": "string",
+      "name": "token name",
+      "revoked": true,
+      "id": 0
+    }
