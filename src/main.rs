@@ -167,11 +167,11 @@ impl Api {
             (None, None) => image,
         };
 
-        if flipv.0.is_some() {
+        if let Some(true) = flipv.0 {
             image = image.flipv();
         }
 
-        if fliph.0.is_some() {
+        if let Some(true) = fliph.0 {
             image = image.fliph();
         }
 
