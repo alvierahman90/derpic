@@ -20,7 +20,7 @@ GET /i
       "upload_date": "2024-06-24T12:30:08"
     }
 
-GET /i/<id>.<png|jpeg|webp>?size=1mb&resolution=1920x1080&rotate=90deg
+x GET /i/<id>.<png|jpeg|webp>?&resolution=1920x1080&rotate=90deg&fliph&flipv
   Description:
     Retrieve uploaded photo, (optionally) scaling and resizing image as requested.
 
@@ -39,16 +39,12 @@ DELETE /i/<id>
       "id": "string"
     }
 
-POST /admin/tokens
+x POST /admin/tokens?name=token_name
   Description:
     Create a new token (user).
 
   Request:
     X-Derpic-Admin-Token
-
-    {
-      "name": "token name"
-    }
 
   Response:
     {
@@ -58,7 +54,7 @@ POST /admin/tokens
       "id": 0
     }
 
-GET /admin/tokens
+x GET /admin/tokens
   Description:
     List all tokens (users).
 
@@ -76,7 +72,7 @@ GET /admin/tokens
       ...
     ]
 
-DELETE /admin/tokens/<id>?delete_images=false
+x DELETE /admin/tokens/<id>?delete_images=false
   Description:
     Revoke a token (user) and (optionally) delete their uploaded images.
     This action is not reversible.

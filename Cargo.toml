@@ -6,9 +6,12 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+base64 = "0.22.1"
+diesel = { version = "2.2.1", features = ["postgres"] }
 dotenvy = "0.15.7"
 image = "0.25.1"
 log = "0.4.21"
 poem = "3.0.1"
 poem-openapi = { version = "5.0.2", features = ["chrono", "openapi-explorer"] }
+rand = "0.8.5"
 tokio = { version = "1.38.0", features = ["rt-multi-thread"] }

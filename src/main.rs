@@ -6,9 +6,11 @@ use poem::{
     Result, Route,
 };
 use poem_openapi::{
-    param::Path, param::Query, payload::Binary, payload::Json, ApiResponse, Object, OpenApi,
+    param::Path, param::Query, param::Header, payload::Binary, payload::Json, ApiResponse, Object, OpenApi,
     OpenApiService,
 };
+
+use derpic::models::*;
 
 struct Api;
 
@@ -16,6 +18,20 @@ struct Api;
 enum ImageResponse {
     #[oai(status = 200, content_type = "image/png")]
     Image(Binary<Vec<u8>>),
+}
+
+#[derive(ApiResponse)]
+enum AdminActionsResponse {
+    #[oai(status = 201, content_type = "application/json")]
+    NewToken(Json<Token>),
+    #[oai(status = 200, content_type = "application/json")]
+    Tokens(Json<Vec<Token>>),
+    #[oai(status = 500)]
+    InternalServerError,
+    #[oai(status = 204)]
+    DeletedToken,
+    #[oai(status = 404)]
+    TokenNotFound,
 }
 
 #[derive(Object)]
@@ -28,18 +44,109 @@ struct ImageFilters {
 
 #[OpenApi]
 impl Api {
+    #[oai(path = "/admin/tokens", method = "get")]
+    async fn get_admin_tokens(
+        &self,
+        #[oai(name = "X-Derpic-Admin-Token")]
+        admin_token: Header<String>,
+        ) -> Result<AdminActionsResponse> {
+        let conn = &mut derpic::db::establish_connection();
+        
+        match Token::get(conn, TokenFilter::default()) {
+            Ok(tokens) => Ok(AdminActionsResponse::Tokens(Json(tokens))),
+            Err(e) => {
+                log::error!("{e}");
+                Ok(AdminActionsResponse::InternalServerError)
+            }
+        }
+
+    }
+
+    #[oai(path = "/admin/tokens", method = "post")]
+    async fn post_admin_tokens(
+        &self,
+        #[oai(name = "X-Derpic-Admin-Token")]
+        admin_token: Header<String>,
+        token_name: Query<String>
+        ) -> Result<AdminActionsResponse> {
+        let conn = &mut derpic::db::establish_connection();
+        
+        match Token::new(conn, NewToken::new(token_name.0)) {
+            Ok(token) => Ok(AdminActionsResponse::NewToken(Json(token))),
+            Err(e) => {
+                log::error!("{e}");
+                Ok(AdminActionsResponse::InternalServerError)
+            }
+        }
+
+    }
+
+    #[oai(path = "/admin/tokens/:id", method = "delete")]
+    async fn delete_admin_tokens(
+        &self,
+        #[oai(name = "X-Derpic-Admin-Token")]
+        admin_token: Header<String>,
+        id: Path<i32>,
+        delete_images: Query<Option<bool>>,
+        ) -> Result<AdminActionsResponse> {
+        let conn = &mut derpic::db::establish_connection();
+        
+        let token = match Token::get(conn, TokenFilter::default().with_id(Some(id.0))) {
+            Err(e) => {
+                log::error!("{e}");
+                return Ok(AdminActionsResponse::InternalServerError);
+            }
+            Ok(tokens) => tokens,
+        }.pop();
+
+        if let Some(token) = token {
+            match token.revoke(conn) {
+                Ok(_) => Ok(AdminActionsResponse::DeletedToken),
+                Err(e) => {
+                    log::error!("{e}");
+                    Ok(AdminActionsResponse::InternalServerError)
+                }
+            }
+        } else {
+            Ok(AdminActionsResponse::TokenNotFound)
+        }
+
+    }
+
     #[oai(path = "/i/:filename", method = "get")]
     async fn get_image(
         &self,
+        #[oai(name = "filename")]
+        /// Name of image to get.
         filename: Path<String>,
+        #[oai(name = "rotation")]
+        /// Angle to rotate image by. Valid values are 90, 180, 270, -90, -180, -270.
         rotation: Query<Option<i32>>,
+        #[oai(name = "width")]
+        /// Maximum width of image. Defaults to actual image width.
+        width: Query<Option<u32>>,
+        #[oai(name = "height")]
+        /// Maximum height of image. Defaults to actual image height.
+        height: Query<Option<u32>>,
+        #[oai(name = "flipv")]
+        /// Flip image vertically.
+        flipv: Query<Option<bool>>,
+        #[oai(name = "fliph")]
+        /// Flip image horizontally.
+        fliph: Query<Option<bool>>,
     ) -> Result<ImageResponse> {
         //dotenv().map_err(InternalServerError)?;
 
+        log::debug!("height={:?}", height.0);
+
+
+        // load image
         let mut image = ImageReader::open(filename.0)
             .map_err(|_| NotFoundError)?
             .decode()
             .map_err(InternalServerError)?;
+
+        // rotate image
         if let Some(angle) = rotation.0 {
             image = match angle {
                 90 => image.rotate90(),
@@ -50,6 +157,22 @@ impl Api {
                 -270 => image.rotate90(),
                 _ => image,
             };
+        };
+
+        // resize image
+        image = match (width.0, height.0) {
+            (Some(width), Some(height)) => image.resize(width, height, image::imageops::FilterType::Triangle),
+            (Some(width), None) => image.resize(width, image.height(), image::imageops::FilterType::Triangle),
+            (None, Some(height)) => image.resize(image.width(), height, image::imageops::FilterType::Triangle),
+            (None, None) => image,
+        };
+
+        if flipv.0.is_some() {
+            image = image.flipv();
+        }
+
+        if fliph.0.is_some() {
+            image = image.fliph();
         }
 
         let mut response = Vec::new();
