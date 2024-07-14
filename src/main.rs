@@ -1,3 +1,4 @@
+use std::env;
 use dotenvy::dotenv;
 use image::io::Reader as ImageReader;
 use poem::{
@@ -32,6 +33,8 @@ enum AdminActionsResponse {
     DeletedToken,
     #[oai(status = 404)]
     TokenNotFound,
+    #[oai(status = 401)]
+    NotAuthorized,
 }
 
 #[derive(Object)]
@@ -42,6 +45,23 @@ struct ImageFilters {
     rotate: Option<i32>,
 }
 
+const DERPIC_ADMIN_TOKEN: &str = "DERPIC_ADMIN_TOKEN";
+
+fn check_admin_token(token: &str) -> bool {
+    match dotenv() {
+        Err(_) => return false,
+        _ => (),
+    }
+        match env::var(DERPIC_ADMIN_TOKEN) {
+            Err(e) => {
+                log::error!("{e}");
+                false
+            }
+            Ok(admin_token) => token == admin_token,
+        }
+
+}
+
 #[OpenApi]
 impl Api {
     #[oai(path = "/admin/tokens", method = "get")]
@@ -50,6 +70,10 @@ impl Api {
         #[oai(name = "X-Derpic-Admin-Token")]
         admin_token: Header<String>,
         ) -> Result<AdminActionsResponse> {
+        if !check_admin_token(&admin_token.0) {
+            return Ok(AdminActionsResponse::NotAuthorized);
+        }
+
         let conn = &mut derpic::db::establish_connection();
         
         match Token::get(conn, TokenFilter::default()) {
@@ -69,6 +93,9 @@ impl Api {
         admin_token: Header<String>,
         token_name: Query<String>
         ) -> Result<AdminActionsResponse> {
+        if !check_admin_token(&admin_token.0) {
+            return Ok(AdminActionsResponse::NotAuthorized);
+        }
         let conn = &mut derpic::db::establish_connection();
         
         match Token::new(conn, NewToken::new(token_name.0)) {
@@ -89,6 +116,9 @@ impl Api {
         id: Path<i32>,
         delete_images: Query<Option<bool>>,
         ) -> Result<AdminActionsResponse> {
+        if !check_admin_token(&admin_token.0) {
+            return Ok(AdminActionsResponse::NotAuthorized);
+        }
         let conn = &mut derpic::db::establish_connection();
         
         let token = match Token::get(conn, TokenFilter::default().with_id(Some(id.0))) {
@@ -135,7 +165,6 @@ impl Api {
         /// Flip image horizontally.
         fliph: Query<Option<bool>>,
     ) -> Result<ImageResponse> {
-        //dotenv().map_err(InternalServerError)?;
 
         log::debug!("height={:?}", height.0);
 
