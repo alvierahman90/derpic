@@ -1,4 +1,3 @@
-use std::env;
 use dotenvy::dotenv;
 use image::io::Reader as ImageReader;
 use poem::{
@@ -7,9 +6,10 @@ use poem::{
     Result, Route,
 };
 use poem_openapi::{
-    param::Path, param::Query, param::Header, payload::Binary, payload::Json, ApiResponse, Object, OpenApi,
-    OpenApiService,
+    param::Header, param::Path, param::Query, payload::Binary, payload::Json, ApiResponse, Object,
+    OpenApi, OpenApiService,
 };
+use std::env;
 
 use derpic::models::*;
 
@@ -52,14 +52,13 @@ fn check_admin_token(token: &str) -> bool {
         Err(_) => return false,
         _ => (),
     }
-        match env::var(DERPIC_ADMIN_TOKEN) {
-            Err(e) => {
-                log::error!("{e}");
-                false
-            }
-            Ok(admin_token) => token == admin_token,
+    match env::var(DERPIC_ADMIN_TOKEN) {
+        Err(e) => {
+            log::error!("{e}");
+            false
         }
-
+        Ok(admin_token) => token == admin_token,
+    }
 }
 
 #[OpenApi]
@@ -67,15 +66,14 @@ impl Api {
     #[oai(path = "/admin/tokens", method = "get")]
     async fn get_admin_tokens(
         &self,
-        #[oai(name = "X-Derpic-Admin-Token")]
-        admin_token: Header<String>,
-        ) -> Result<AdminActionsResponse> {
+        #[oai(name = "X-Derpic-Admin-Token")] admin_token: Header<String>,
+    ) -> Result<AdminActionsResponse> {
         if !check_admin_token(&admin_token.0) {
             return Ok(AdminActionsResponse::NotAuthorized);
         }
 
         let conn = &mut derpic::db::establish_connection();
-        
+
         match Token::get(conn, TokenFilter::default()) {
             Ok(tokens) => Ok(AdminActionsResponse::Tokens(Json(tokens))),
             Err(e) => {
@@ -83,21 +81,19 @@ impl Api {
                 Ok(AdminActionsResponse::InternalServerError)
             }
         }
-
     }
 
     #[oai(path = "/admin/tokens", method = "post")]
     async fn post_admin_tokens(
         &self,
-        #[oai(name = "X-Derpic-Admin-Token")]
-        admin_token: Header<String>,
-        token_name: Query<String>
-        ) -> Result<AdminActionsResponse> {
+        #[oai(name = "X-Derpic-Admin-Token")] admin_token: Header<String>,
+        token_name: Query<String>,
+    ) -> Result<AdminActionsResponse> {
         if !check_admin_token(&admin_token.0) {
             return Ok(AdminActionsResponse::NotAuthorized);
         }
         let conn = &mut derpic::db::establish_connection();
-        
+
         match Token::new(conn, NewToken::new(token_name.0)) {
             Ok(token) => Ok(AdminActionsResponse::NewToken(Json(token))),
             Err(e) => {
@@ -105,29 +101,28 @@ impl Api {
                 Ok(AdminActionsResponse::InternalServerError)
             }
         }
-
     }
 
     #[oai(path = "/admin/tokens/:id", method = "delete")]
     async fn delete_admin_tokens(
         &self,
-        #[oai(name = "X-Derpic-Admin-Token")]
-        admin_token: Header<String>,
+        #[oai(name = "X-Derpic-Admin-Token")] admin_token: Header<String>,
         id: Path<i32>,
         delete_images: Query<Option<bool>>,
-        ) -> Result<AdminActionsResponse> {
+    ) -> Result<AdminActionsResponse> {
         if !check_admin_token(&admin_token.0) {
             return Ok(AdminActionsResponse::NotAuthorized);
         }
         let conn = &mut derpic::db::establish_connection();
-        
+
         let token = match Token::get(conn, TokenFilter::default().with_id(Some(id.0))) {
             Err(e) => {
                 log::error!("{e}");
                 return Ok(AdminActionsResponse::InternalServerError);
             }
             Ok(tokens) => tokens,
-        }.pop();
+        }
+        .pop();
 
         if let Some(token) = token {
             match token.revoke(conn) {
@@ -140,7 +135,6 @@ impl Api {
         } else {
             Ok(AdminActionsResponse::TokenNotFound)
         }
-
     }
 
     #[oai(path = "/i/:filename", method = "get")]
@@ -165,9 +159,7 @@ impl Api {
         /// Flip image horizontally.
         fliph: Query<Option<bool>>,
     ) -> Result<ImageResponse> {
-
         log::debug!("height={:?}", height.0);
-
 
         // load image
         let mut image = ImageReader::open(filename.0)
@@ -190,9 +182,15 @@ impl Api {
 
         // resize image
         image = match (width.0, height.0) {
-            (Some(width), Some(height)) => image.resize(width, height, image::imageops::FilterType::Triangle),
-            (Some(width), None) => image.resize(width, image.height(), image::imageops::FilterType::Triangle),
-            (None, Some(height)) => image.resize(image.width(), height, image::imageops::FilterType::Triangle),
+            (Some(width), Some(height)) => {
+                image.resize(width, height, image::imageops::FilterType::Triangle)
+            }
+            (Some(width), None) => {
+                image.resize(width, image.height(), image::imageops::FilterType::Triangle)
+            }
+            (None, Some(height)) => {
+                image.resize(image.width(), height, image::imageops::FilterType::Triangle)
+            }
             (None, None) => image,
         };
 

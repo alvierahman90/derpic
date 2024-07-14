@@ -1,9 +1,8 @@
-use diesel::prelude::*;
 use crate::schema::tokens::{self, dsl};
-use poem_openapi::Object;
-use diesel::result::Error as DieselError;
 use diesel::pg::PgConnection;
-
+use diesel::prelude::*;
+use diesel::result::Error as DieselError;
+use poem_openapi::Object;
 
 #[derive(Object, Queryable, Selectable)]
 #[diesel(table_name = tokens)]
@@ -16,9 +15,11 @@ pub struct Token {
 }
 
 impl Token {
-
     pub fn new(conn: &mut PgConnection, new_token: NewToken) -> Result<Self, DieselError> {
-        diesel::insert_into(tokens::table).values(&new_token).returning(Token::as_returning()).get_result(conn)
+        diesel::insert_into(tokens::table)
+            .values(&new_token)
+            .returning(Token::as_returning())
+            .get_result(conn)
     }
 
     pub fn get(conn: &mut PgConnection, filters: TokenFilter) -> Result<Vec<Token>, DieselError> {
@@ -48,7 +49,10 @@ impl Token {
     }
 
     pub fn revoke(self, conn: &mut PgConnection) -> Result<Self, DieselError> {
-        diesel::update(dsl::tokens.find(self.id)).set(dsl::revoked.eq(true)).returning(Self::as_returning()).get_result(conn)
+        diesel::update(dsl::tokens.find(self.id))
+            .set(dsl::revoked.eq(true))
+            .returning(Self::as_returning())
+            .get_result(conn)
     }
 }
 
@@ -80,9 +84,6 @@ pub struct TokenFilter {
 
 impl TokenFilter {
     pub fn with_id(self, id: Option<i32>) -> Self {
-        Self {
-            id,
-            ..self
-        }
+        Self { id, ..self }
     }
 }
