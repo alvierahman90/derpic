@@ -42,16 +42,6 @@ impl From<DbImage> for DbImageNoImageData {
     }
 }
 
-#[derive(Enum, diesel_derive_enum::DbEnum, Debug, PartialEq)]
-#[ExistingTypePath = "crate::schema::sql_types::ImageFormat"]
-pub enum DbImageFormat {
-    Png,
-    Jpeg,
-    Webp,
-    Gif,
-    Heic,
-}
-
 impl DbImage {
     pub fn id(&self) -> i32 {
         self.id

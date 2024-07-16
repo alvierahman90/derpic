@@ -1,5 +1,5 @@
+use diesel::result::Error as DieselError;
 use dotenvy::dotenv;
-use image::io::Reader as ImageReader;
 use poem::{
     error::{InternalServerError, NotFoundError},
     listener::TcpListener,
@@ -24,15 +24,13 @@ enum ImageResponse {
 #[derive(ApiResponse)]
 enum AdminActionsResponse {
     #[oai(status = 201, content_type = "application/json")]
-    NewToken(Json<Token>),
+    NewToken(Json<TokenEncodedSlug>),
     #[oai(status = 200, content_type = "application/json")]
-    Tokens(Json<Vec<Token>>),
+    Tokens(Json<Vec<TokenEncodedSlug>>),
     #[oai(status = 500)]
     InternalServerError,
     #[oai(status = 204)]
     DeletedToken,
-    #[oai(status = 404)]
-    TokenNotFound,
     #[oai(status = 401)]
     NotAuthorized,
 }
@@ -97,7 +95,9 @@ impl Api {
         let conn = &mut derpic::db::establish_connection();
 
         match Token::get(conn, TokenFilter::default()) {
-            Ok(tokens) => Ok(AdminActionsResponse::Tokens(Json(tokens))),
+            Ok(tokens) => Ok(AdminActionsResponse::Tokens(Json(
+                tokens.into_iter().map(|t| t.into()).collect(),
+            ))),
             Err(e) => {
                 log::error!("{e}");
                 Ok(AdminActionsResponse::InternalServerError)
@@ -117,7 +117,7 @@ impl Api {
         let conn = &mut derpic::db::establish_connection();
 
         match Token::new(conn, NewToken::new(token_name.0)) {
-            Ok(token) => Ok(AdminActionsResponse::NewToken(Json(token))),
+            Ok(token) => Ok(AdminActionsResponse::NewToken(Json(token.into()))),
             Err(e) => {
                 log::error!("{e}");
                 Ok(AdminActionsResponse::InternalServerError)
@@ -146,17 +146,33 @@ impl Api {
         }
         .pop();
 
-        if let Some(token) = token {
-            match token.revoke(conn) {
-                Ok(_) => Ok(AdminActionsResponse::DeletedToken),
-                Err(e) => {
-                    log::error!("{e}");
-                    Ok(AdminActionsResponse::InternalServerError)
-                }
-            }
-        } else {
-            Ok(AdminActionsResponse::TokenNotFound)
+        if token.is_none() {
+            return Err(NotFoundError.into());
         }
+
+        let token = token.unwrap();
+
+        if let Some(true) = delete_images.0 {
+            let deleted_images = DbImage::get(
+                conn,
+                DbImageFilter::default().with_token_id(Some(token.id())),
+            )
+            .map_err(InternalServerError)?
+            .into_iter()
+            .map(|e| e.delete(conn))
+            .collect::<Vec<Result<usize, DieselError>>>();
+
+            for result in deleted_images {
+                result.map_err(InternalServerError)?;
+            }
+        }
+
+        if let Err(e) = token.revoke(conn) {
+            log::error!("{e}");
+            return Err(InternalServerError(e));
+        }
+
+        Ok(AdminActionsResponse::DeletedToken)
     }
 
     #[oai(path = "/i/:slug", method = "get")]
@@ -255,7 +271,13 @@ impl Api {
         #[oai(name = "X-Derpic--Token")] token: Header<String>,
     ) -> Result<ListImagesResponse> {
         let conn = &mut derpic::db::establish_connection();
-        let token = match Token::get_by_token(conn, token.0) {
+
+        let token = match token_decode(token.0) {
+            Err(_) => return Err(NotFoundError.into()),
+            Ok(token) => token,
+        };
+
+        let token = match Token::get_by_token(conn, token) {
             Err(e) => {
                 log::error!("{e}");
                 return Err(InternalServerError(e));
@@ -283,7 +305,12 @@ impl Api {
         data: Binary<Vec<u8>>,
     ) -> Result<ImageUploadResult> {
         let conn = &mut derpic::db::establish_connection();
-        let token = match Token::get_by_token(conn, token.0) {
+        let token = match token_decode(token.0) {
+            Err(_) => return Ok(ImageUploadResult::NotAuthorized),
+            Ok(token) => token,
+        };
+
+        let token = match Token::get_by_token(conn, token) {
             Err(e) => {
                 log::error!("{e}");
                 return Err(InternalServerError(e));
@@ -325,7 +352,12 @@ impl Api {
             Ok(Some(i)) => i,
         };
 
-        let token = match Token::get_by_token(conn, token.0) {
+        let token = match token_decode(token.0) {
+            Err(_) => return Err(NotFoundError.into()),
+            Ok(token) => token,
+        };
+
+        let token = match Token::get_by_token(conn, token) {
             Err(e) => {
                 log::error!("{e}");
                 return Err(InternalServerError(e));
@@ -346,6 +378,7 @@ impl Api {
 
 #[tokio::main]
 async fn main() -> Result<(), std::io::Error> {
+    env_logger::init();
     let api_service = OpenApiService::new(Api, "derpic", "0.1").server("http://localhost:3000/");
     let ui_service = api_service.openapi_explorer();
 
