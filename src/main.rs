@@ -268,11 +268,30 @@ impl Api {
     #[oai(path = "/i", method = "get")]
     async fn get_images(
         &self,
-        #[oai(name = "X-Derpic--Token")] token: Header<String>,
+        #[oai(name = "X-Derpic-Token")] token: Header<Option<String>>,
+        #[oai(name = "X-Derpic-Admin-Token")] admin_token: Header<Option<String>>,
     ) -> Result<ListImagesResponse> {
         let conn = &mut derpic::db::establish_connection();
 
-        let token = match token_decode(token.0) {
+        if let Some(token) = admin_token.0 {
+            if !check_admin_token(&token) {
+                return Ok(ListImagesResponse::NotAuthorized);
+            }
+
+            return Ok(ListImagesResponse::Images(Json(
+                DbImage::get(conn, DbImageFilter::default())
+                    .map_err(InternalServerError)?
+                    .into_iter()
+                    .map(|image| image.into())
+                    .collect(),
+            )));
+        }
+
+        if token.is_none() {
+            return Ok(ListImagesResponse::NotAuthorized);
+        }
+
+        let token = match token_decode(token.0.unwrap()) {
             Err(_) => return Err(NotFoundError.into()),
             Ok(token) => token,
         };

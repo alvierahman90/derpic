@@ -4,7 +4,7 @@ use base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine as _};
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
 use diesel::result::Error as DieselError;
-use poem_openapi::{Enum, Object};
+use poem_openapi::Object;
 
 fn slug_encode(slug: Vec<u8>) -> String {
     URL_SAFE_NO_PAD.encode(slug)
