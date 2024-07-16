@@ -15,6 +15,22 @@ pub struct Token {
 }
 
 impl Token {
+    pub fn id(&self) -> i32 {
+        self.id
+    }
+
+    pub fn token(&self) -> String {
+        self.token.clone()
+    }
+
+    pub fn name(&self) -> String {
+        self.name.clone()
+    }
+
+    pub fn revoked(&self) -> bool {
+        self.revoked
+    }
+
     pub fn new(conn: &mut PgConnection, new_token: NewToken) -> Result<Self, DieselError> {
         diesel::insert_into(tokens::table)
             .values(&new_token)
@@ -42,6 +58,17 @@ impl Token {
         }
 
         query.select(Self::as_select()).load(conn)
+    }
+
+    pub fn get_by_token(
+        conn: &mut PgConnection,
+        token: String,
+    ) -> Result<Option<Self>, DieselError> {
+        Ok(tokens::table
+            .filter(tokens::token.eq(token))
+            .select(Self::as_select())
+            .load(conn)?
+            .pop())
     }
 
     pub fn delete(self, conn: &mut PgConnection) -> Result<usize, DieselError> {

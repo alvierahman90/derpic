@@ -37,6 +37,22 @@ enum AdminActionsResponse {
     NotAuthorized,
 }
 
+#[derive(ApiResponse)]
+enum ImageUploadResult {
+    #[oai(status = 201, content_type = "application/json")]
+    CreatedImage(Json<i32>),
+    #[oai(status = 401)]
+    NotAuthorized,
+}
+
+#[derive(ApiResponse)]
+enum ListImagesResponse {
+    #[oai(status = 200, content_type = "application/json")]
+    Images(Json<Vec<DbImageNoImageData>>),
+    #[oai(status = 401)]
+    NotAuthorized,
+}
+
 #[derive(Object)]
 struct ImageFilters {
     format: String,
@@ -48,9 +64,9 @@ struct ImageFilters {
 const DERPIC_ADMIN_TOKEN: &str = "DERPIC_ADMIN_TOKEN";
 
 fn check_admin_token(token: &str) -> bool {
-    match dotenv() {
-        Err(_) => return false,
-        _ => (),
+    if let Err(e) = dotenv() {
+        log::error!("{e}");
+        return false;
     }
     match env::var(DERPIC_ADMIN_TOKEN) {
         Err(e) => {
@@ -137,12 +153,12 @@ impl Api {
         }
     }
 
-    #[oai(path = "/i/:filename", method = "get")]
+    #[oai(path = "/i/:slug", method = "get")]
     async fn get_image(
         &self,
-        #[oai(name = "filename")]
+        #[oai(name = "slug")]
         /// Name of image to get.
-        filename: Path<String>,
+        slug: Path<String>,
         #[oai(name = "rotation")]
         /// Angle to rotate image by. Valid values are 90, 180, 270, -90, -180, -270.
         rotation: Query<Option<i32>>,
@@ -160,12 +176,23 @@ impl Api {
         fliph: Query<Option<bool>>,
     ) -> Result<ImageResponse> {
         log::debug!("height={:?}", height.0);
+        let conn = &mut derpic::db::establish_connection();
+        let db_image = match DbImage::get_by_slug(conn, slug.0) {
+            Err(e) => {
+                log::error!("{e}");
+                return Err(InternalServerError(Box::new(e)));
+            }
+            Ok(None) => return Err(NotFoundError.into()),
+            Ok(Some(i)) => i,
+        };
 
-        // load image
-        let mut image = ImageReader::open(filename.0)
-            .map_err(|_| NotFoundError)?
-            .decode()
-            .map_err(InternalServerError)?;
+        let mut image = match db_image.as_image() {
+            Err(e) => {
+                log::error!("{e}");
+                return Err(InternalServerError(e));
+            }
+            Ok(i) => i,
+        };
 
         // rotate image
         if let Some(angle) = rotation.0 {
@@ -214,6 +241,64 @@ impl Api {
             .map_err(InternalServerError)?;
 
         Ok(ImageResponse::Image(Binary(response)))
+    }
+
+    #[oai(path = "/i", method = "get")]
+    async fn get_images(
+        &self,
+        #[oai(name = "X-Derpic--Token")] token: Header<String>,
+    ) -> Result<ListImagesResponse> {
+        let conn = &mut derpic::db::establish_connection();
+        let token = match Token::get_by_token(conn, token.0) {
+            Err(e) => {
+                log::error!("{e}");
+                return Err(InternalServerError(e));
+            }
+            Ok(None) => return Ok(ListImagesResponse::NotAuthorized),
+            Ok(Some(token)) => token,
+        };
+
+        Ok(ListImagesResponse::Images(Json(
+            DbImage::get(
+                conn,
+                DbImageFilter::default().with_token_id(Some(token.id())),
+            )
+            .map_err(InternalServerError)?
+            .into_iter()
+            .map(|image| image.into())
+            .collect(),
+        )))
+    }
+
+    #[oai(path = "/i", method = "post")]
+    async fn post_image(
+        &self,
+        #[oai(name = "X-Derpic--Token")] token: Header<String>,
+        data: Binary<Vec<u8>>,
+    ) -> Result<ImageUploadResult> {
+        let conn = &mut derpic::db::establish_connection();
+        let token = match Token::get_by_token(conn, token.0) {
+            Err(e) => {
+                log::error!("{e}");
+                return Err(InternalServerError(e));
+            }
+            Ok(None) => return Ok(ImageUploadResult::NotAuthorized),
+            Ok(Some(token)) => token,
+        };
+
+        match DbImage::new(
+            conn,
+            NewDbImage {
+                token_id: token.id(),
+                image: data.0,
+            },
+        ) {
+            Err(e) => {
+                log::error!("{e}");
+                Err(InternalServerError(e))
+            }
+            Ok(image) => Ok(ImageUploadResult::CreatedImage(Json(image.id()))),
+        }
     }
 }
 

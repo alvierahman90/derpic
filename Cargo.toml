@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 base64 = "0.22.1"
 diesel = { version = "2.2.1", features = ["postgres"] }
+diesel-derive-enum = { version = "2.1.0", features = ["postgres"] }
 dotenvy = "0.15.7"
 image = "0.25.1"
 log = "0.4.21"
