@@ -5,7 +5,10 @@
 1. Create a `.env` file with the following variables defined (edited as required):
 
    ```
-   DATABASE_URL=postgres://postgres:very_secure@localhost/derpic
+   POSTGRES_PASSWORD=very_secure
+   POSTGRES_USERNAME=postgres
+   POSTGRES_HOST=db
+   POSTGRES_DB=fel_dms
    DERPIC_ADMIN_TOKEN=changeme
    DERPIC_PUBLIC_BASE_URL=https://i.dev.alv.cx/
    ```

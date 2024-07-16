@@ -5,13 +5,12 @@ services:
       target: final
     restart: unless-stopped
     ports:
-      - 3000:3000
+      - 3891:3000
     environment:
-      DERPIC_DATABASE_URL: ${DATABASE_URL}
+      DERPIC_DATABASE_URL: "postgres://${POSTGRES_USERNAME}:${POSTGRES_PASSWORD}@db/${POSTGRES_DB}?sslmode=disable"
       DERPIC_ADMIN_TOKEN: ${DERPIC_ADMIN_TOKEN}
       DERPIC_PUBLIC_BASE_URL: ${DERPIC_PUBLIC_BASE_URL}
-      RUST_LOG: debug
-      RUST_BACKTRACE: full
+      RUST_LOG: ${RUST_LOG:-info}
   derpic_postgres:
     image: postgres:16
     ports: [ "5432:5432" ]
