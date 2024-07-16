@@ -66,6 +66,7 @@ struct ImageFilters {
 }
 
 const DERPIC_ADMIN_TOKEN: &str = "DERPIC_ADMIN_TOKEN";
+const DERPIC_PUBLIC_BASE_URL: &str = "DERPIC_PUBLIC_BASE_URL";
 
 fn check_admin_token(token: &str) -> bool {
     if let Err(e) = dotenv() {
@@ -397,8 +398,12 @@ impl Api {
 
 #[tokio::main]
 async fn main() -> Result<(), std::io::Error> {
+    dotenv().ok();
     env_logger::init();
-    let api_service = OpenApiService::new(Api, "derpic", "0.1").server("http://localhost:3000/");
+    let api_service = OpenApiService::new(Api, "derpic", "0.1").server(
+        env::var(DERPIC_PUBLIC_BASE_URL)
+            .expect("DERPIC_PUBLIC_BASE_URL environment variable not defined"),
+    );
     let ui_service = api_service.openapi_explorer();
 
     poem::Server::new(TcpListener::bind("0.0.0.0:3000"))
