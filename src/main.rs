@@ -53,6 +53,12 @@ enum ListImagesResponse {
     NotAuthorized,
 }
 
+#[derive(ApiResponse)]
+enum DeleteImagesResponse {
+    #[oai(status = 200, content_type = "application/json")]
+    Ok(Json<usize>),
+}
+
 #[derive(Object)]
 struct ImageFilters {
     format: String,
@@ -299,6 +305,42 @@ impl Api {
             }
             Ok(image) => Ok(ImageUploadResult::CreatedImage(Json(image.id()))),
         }
+    }
+
+    #[oai(path = "/i/:slug", method = "delete")]
+    async fn delete_image(
+        &self,
+        #[oai(name = "slug")]
+        /// Name of image to get.
+        slug: Path<String>,
+        #[oai(name = "X-Derpic--Token")] token: Header<String>,
+    ) -> Result<DeleteImagesResponse> {
+        let conn = &mut derpic::db::establish_connection();
+        let db_image = match DbImage::get_by_slug(conn, slug.0) {
+            Err(e) => {
+                log::error!("{e}");
+                return Err(InternalServerError(Box::new(e)));
+            }
+            Ok(None) => return Err(NotFoundError.into()),
+            Ok(Some(i)) => i,
+        };
+
+        let token = match Token::get_by_token(conn, token.0) {
+            Err(e) => {
+                log::error!("{e}");
+                return Err(InternalServerError(e));
+            }
+            Ok(None) => return Err(NotFoundError.into()),
+            Ok(Some(token)) => token,
+        };
+
+        if db_image.token_id() != token.id() {
+            return Err(NotFoundError.into());
+        }
+
+        Ok(DeleteImagesResponse::Ok(Json(
+            db_image.delete(conn).map_err(InternalServerError)?,
+        )))
     }
 }
 
