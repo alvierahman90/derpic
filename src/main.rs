@@ -69,10 +69,6 @@ const DERPIC_ADMIN_TOKEN: &str = "DERPIC_ADMIN_TOKEN";
 const DERPIC_PUBLIC_BASE_URL: &str = "DERPIC_PUBLIC_BASE_URL";
 
 fn check_admin_token(token: &str) -> bool {
-    if let Err(e) = dotenv() {
-        log::error!("{e}");
-        return false;
-    }
     match env::var(DERPIC_ADMIN_TOKEN) {
         Err(e) => {
             log::error!("{e}");
@@ -321,7 +317,7 @@ impl Api {
     #[oai(path = "/i", method = "post")]
     async fn post_image(
         &self,
-        #[oai(name = "X-Derpic--Token")] token: Header<String>,
+        #[oai(name = "X-Derpic-Token")] token: Header<String>,
         data: Binary<Vec<u8>>,
     ) -> Result<ImageUploadResult> {
         let conn = &mut derpic::db::establish_connection();
@@ -360,7 +356,7 @@ impl Api {
         #[oai(name = "slug")]
         /// Name of image to get.
         slug: Path<String>,
-        #[oai(name = "X-Derpic--Token")] token: Header<String>,
+        #[oai(name = "X-Derpic-Token")] token: Header<String>,
     ) -> Result<DeleteImagesResponse> {
         let conn = &mut derpic::db::establish_connection();
         let db_image = match DbImage::get_by_slug(conn, slug.0) {
