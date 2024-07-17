@@ -4,10 +4,13 @@ services:
       context: .
       target: final
     restart: unless-stopped
+    depends_on:
+      derpic_postgres:
+        condition: service_healthy
     ports:
       - 3891:3000
     environment:
-      DERPIC_DATABASE_URL: "postgres://${POSTGRES_USERNAME}:${POSTGRES_PASSWORD}@db/${POSTGRES_DB}?sslmode=disable"
+      DERPIC_DATABASE_URL: "postgres://${POSTGRES_USERNAME}:${POSTGRES_PASSWORD}@derpic_postgres/${POSTGRES_DB}?sslmode=disable"
       DERPIC_ADMIN_TOKEN: ${DERPIC_ADMIN_TOKEN}
       DERPIC_PUBLIC_BASE_URL: ${DERPIC_PUBLIC_BASE_URL}
       RUST_LOG: ${RUST_LOG:-info}
