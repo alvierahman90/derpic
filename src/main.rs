@@ -396,7 +396,9 @@ impl Api {
 async fn main() -> Result<(), std::io::Error> {
     dotenv().ok();
     env_logger::init();
-    derpic::db::run_migrations();
+    let conn = &mut derpic::db::establish_connection();
+    derpic::db::run_migrations(conn).unwrap();
+
     let api_service = OpenApiService::new(Api, "derpic", "0.1").server(
         env::var(DERPIC_PUBLIC_BASE_URL)
             .expect("DERPIC_PUBLIC_BASE_URL environment variable not defined"),
