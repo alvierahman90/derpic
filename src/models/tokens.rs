@@ -88,12 +88,14 @@ impl Token {
         query.select(Self::as_select()).load(conn)
     }
 
+    /// Retrieves a token by its token, **filtering out revoked tokens*.
     pub fn get_by_token(
         conn: &mut PgConnection,
         token: Vec<u8>,
     ) -> Result<Option<Self>, DieselError> {
         Ok(tokens::table
             .filter(tokens::token.eq(token))
+            .filter(tokens::revoked.eq(false))
             .select(Self::as_select())
             .load(conn)?
             .pop())
