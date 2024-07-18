@@ -2,8 +2,10 @@ use diesel::result::Error as DieselError;
 use dotenvy::dotenv;
 use poem::{
     error::{InternalServerError, NotFoundError},
+    http::Method,
     listener::TcpListener,
-    Result, Route,
+    middleware::Cors,
+    EndpointExt, Result, Route,
 };
 use poem_openapi::{
     param::Header, param::Path, param::Query, payload::Binary, payload::Json, ApiResponse, Object,
@@ -406,6 +408,18 @@ async fn main() -> Result<(), std::io::Error> {
     let ui_service = api_service.openapi_explorer();
 
     poem::Server::new(TcpListener::bind("0.0.0.0:3000"))
-        .run(Route::new().nest("/", api_service).nest("/ui", ui_service))
+        .run(
+            Route::new()
+                .nest(
+                    "/",
+                    api_service.with(Cors::new().allow_origin("*").allow_methods([
+                        Method::GET,
+                        Method::POST,
+                        Method::OPTIONS,
+                        Method::DELETE,
+                    ])),
+                )
+                .nest("/ui", ui_service),
+        )
         .await
 }
