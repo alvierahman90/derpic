@@ -2,7 +2,6 @@ use diesel::result::Error as DieselError;
 use dotenvy::dotenv;
 use poem::{
     error::{InternalServerError, NotFoundError},
-    http::Method,
     listener::TcpListener,
     middleware::Cors,
     EndpointExt, Result, Route,
@@ -57,6 +56,12 @@ enum ListImagesResponse {
 enum DeleteImagesResponse {
     #[oai(status = 200, content_type = "application/json")]
     Ok(Json<usize>),
+}
+
+#[derive(ApiResponse)]
+enum MeResponse {
+    #[oai(status = 200)]
+    Ok(Json<TokenEncodedSlug>),
 }
 
 #[derive(Object)]
@@ -392,6 +397,29 @@ impl Api {
             db_image.delete(conn).map_err(InternalServerError)?,
         )))
     }
+
+    #[oai(path = "/me", method = "get")]
+    async fn get_me(
+        &self,
+        #[oai(name = "X-Derpic-Username")] username: Header<String>,
+        #[oai(name = "X-Derpic-Token")] token: Header<String>,
+    ) -> Result<MeResponse> {
+        let conn = &mut derpic::db::establish_connection();
+
+        let token = match token_decode(token.0) {
+            Err(_) => return Err(NotFoundError.into()),
+            Ok(token) => match Token::get_by_token(conn, token) {
+                Ok(Some(token)) => token,
+                Ok(None) => return Err(NotFoundError.into()),
+                Err(e) => return Err(InternalServerError(e)),
+            },
+        };
+
+        match username.0 == token.name() {
+            true => Ok(MeResponse::Ok(Json(token.into()))),
+            false => Err(NotFoundError.into()),
+        }
+    }
 }
 
 #[tokio::main]
@@ -410,15 +438,7 @@ async fn main() -> Result<(), std::io::Error> {
     poem::Server::new(TcpListener::bind("0.0.0.0:3000"))
         .run(
             Route::new()
-                .nest(
-                    "/",
-                    api_service.with(Cors::new().allow_origin("*").allow_methods([
-                        Method::GET,
-                        Method::POST,
-                        Method::OPTIONS,
-                        Method::DELETE,
-                    ])),
-                )
+                .nest("/", api_service.with(Cors::new()))
                 .nest("/ui", ui_service),
         )
         .await
