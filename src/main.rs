@@ -426,6 +426,8 @@ impl Api {
 async fn main() -> Result<(), std::io::Error> {
     dotenv().ok();
     env_logger::init();
+    log::info!("DERPIC_STATIC_FILES={}", derpic::static_files_directory());
+
     let conn = &mut derpic::db::establish_connection();
     derpic::db::run_migrations(conn).unwrap();
 
@@ -440,10 +442,8 @@ async fn main() -> Result<(), std::io::Error> {
             Route::new()
                 .nest(
                     "/dash",
-                    poem::endpoint::StaticFilesEndpoint::new(
-                        env::var("DERPIC_STATIC_FILES").unwrap_or("/opt/derpic/src-web".into()),
-                    )
-                    .index_file("index.html"),
+                    poem::endpoint::StaticFilesEndpoint::new(derpic::static_files_directory())
+                        .index_file("index.html"),
                 )
                 .nest("/", api_service.with(Cors::new()))
                 .nest("/ui", ui_service),

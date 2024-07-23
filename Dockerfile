@@ -51,6 +51,9 @@ FROM debian:bullseye-slim AS final
 
 RUN apt update && apt install -y libpq-dev libssl-dev openssl ca-certificates curl
 
+RUN mkdir -p /opt/derpic
+COPY ./src-web /opt/derpic/src-web
+
 # Create a non-privileged user that the app will run under.
 # See https://docs.docker.com/develop/develop-images/dockerfile_best-practices/   #user
 ARG UID=10001
@@ -62,6 +65,8 @@ RUN adduser \
     --no-create-home \
     --uid "${UID}" \
     appuser
+
+RUN chown ${UID}:0 -R /opt/derpic
 USER appuser
 
 # Copy the executable from the "build" stage.
