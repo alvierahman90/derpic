@@ -1,0 +1,747 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+h1{
+    font-size: 50px;
+    margin: 10px;
+}
+body {
+    padding: 0px;
+    background-color: #F2F2F2;
+    font-family: "Open Sans", sans-serif;
+    color: #282828;
+    margin: 0;
+}
+
+
+.content {          
+    display: flex;
+    flex-wrap: wrap;
+    padding: 1em;
+}
+
+
+
+/* -----------------UTILITY-----------------  */
+.grid-col-span-2{
+    grid-column: span 2;
+}
+
+/* -----------------Input grid-------------- */
+
+.mainPic{
+    width: 100%;
+    height: 100%;
+}
+.mainPic img{
+    max-width: 200px;
+    max-height: 330px;
+    object-fit: cover;
+}
+
+.left-area {
+    background-color:  #e8e8e8;
+    flex: 0 0 40%;
+    padding: 1em;
+    min-width: 360px; 
+}
+
+
+
+.grid-2x2 {
+    background-color:  #e8e8e8;
+    color: #282828;
+    display: grid; 
+    grid-template-columns: 5fr 1fr;
+    grid-template-rows: 2fr 1fr;
+    gap: 1em;
+}
+
+.input-box{
+    max-width: 600px;
+    max-height: 330px;
+    min-width: 100px;
+    min-height: 150px ;
+    /* background: #e8e8e8; */
+    text-align: center;
+    border-radius: 20px ;
+}
+
+#img-view{
+    align-content: center;
+    font-weight: 600;
+    
+}
+
+#img-view{
+    min-width: 100px;
+    min-height: 330px;
+    border-radius: 10px;
+    border: 2px dashed #a8a8a8;
+    /* background: #e8e8e8; */
+  
+
+}
+pre{
+    white-space: pre-wrap;
+    overflow-x: scroll;
+}
+pre::-webkit-scrollbar {
+    display: none; 
+  }
+  pre{
+    -ms-overflow-style: none;  
+    scrollbar-width: none;  
+  }
+
+.info-area{
+    /* font-size: 1.5vw; */
+    white-space: pre-wrap;
+    max-width: 400px;
+    min-width: 80px;
+}
+
+/* .info-area{
+    
+} */
+.bold-font{
+    font-weight: 700;
+}
+
+.tools{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    width: 100px;
+}
+
+/* #metadata{
+    display: flex;
+    flex-wrap: wrap;
+    font-size: 13px;
+} */
+
+
+
+/* ----------------buttons---------------------- */
+
+.button {
+    background-color: #282828;
+    border: none;
+    color: white;
+    padding: 5px 5px;
+    height:30px;
+    min-width:90px;
+    border-radius: 5px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 700;
+    transition-duration: 0.2s;
+  }
+.button:hover{
+     background-color: #585858;
+     cursor: pointer;
+}
+
+.button:disabled{
+    background-color: #585858;
+    cursor: not-allowed;
+}
+
+.logout-button {
+    background-color: #282828;
+    border: none;
+    color: white;
+    padding: 5px 5px;
+    height:30px;
+    max-width:80px;
+    border-radius: 5px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 700;
+    transition-duration: 0.2s;
+  }
+.logout-button:hover{
+     background-color: #585858;
+     cursor: pointer;
+}
+
+.logout-button:disabled{
+    background-color: #585858;
+    cursor: not-allowed;
+}
+/* ------------------- META DATA CHECKBOX-------------------------------- */
+
+
+.meta-checkbox-container input[type="checkbox"] {
+    display: none;
+}
+.meta-checkbox-container {
+    display: inline-block;
+    position: relative;
+    /* padding-left: 80px;  */
+    cursor: pointer;
+    font-size: 16px;
+    user-select: none;
+}
+
+.meta-checkbox-container::before {
+    content: "Meta off";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 30px; 
+    min-width:90px;  
+    border-radius: 5px;
+    background-color: #585858;
+    /* border: 1px solid #ccc; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px; 
+    font-weight: 700;
+    color: #fff;
+    text-align: center;
+}
+
+
+.meta-checkbox-container input[type="checkbox"]:checked + .meta-checkbox-text::before {
+    background-color: #282828;
+    border-color: #282828;
+    color: white;
+}
+
+
+.meta-checkbox-text::before {
+    content: "Meta on"; 
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    border-radius: 5px;
+    min-width:90px; 
+    height: 30px; 
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px; 
+    color: transparent;
+    transition: color 0.2s;
+}
+
+
+.meta-checkbox-container input[type="checkbox"]:checked + .meta-checkbox-text::before {
+    color: white;
+}
+
+
+.meta-checkbox-text {
+    padding-left: 10px;
+    vertical-align: middle;
+}
+/* ----------------NIGHTMODE CHECKBOX--------------------- */
+
+.night-checkbox-container {
+    width: 30px;
+    height: 30px;
+    display: inline-block;
+    position: relative;
+    
+    cursor: pointer;
+    font-size: 16px;
+    user-select: none;
+}
+
+.night-checkbox-container input[type="checkbox"] {
+    display: none;
+}
+
+
+.night-checkbox-container::before {
+    content: "\f185";
+    font-family: "Font Awesome 5 Free";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 30px; 
+    width: 30px;  
+    border-radius: 5px;
+    background-color: #f1f1f1;
+   
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px; 
+     font-weight:700; 
+    color: #181818;
+    text-align: center;
+}
+
+
+.night-checkbox-container input[type="checkbox"]:checked + .night-checkbox-text::before {
+    background-color: #282828;
+    border-color: #282828;
+    color: white;
+}
+
+
+.night-checkbox-text::before {
+    
+    content: "\f186"; 
+    font-family: "Font Awesome 5 Free";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    border-radius: 5px;
+    width: 30px; 
+    height: 30px; 
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px; 
+    color: transparent;
+    transition: color 0.2s;
+}
+
+
+.night-checkbox-container input[type="checkbox"]:checked + .night-checkbox-text::before {
+    color: white;
+
+}
+
+
+.night-checkbox-text {
+ 
+    vertical-align: middle;
+}
+
+
+
+
+
+/* ---------------------Gallery and related------------------------------ */
+
+.right-area {
+    border: solid;
+    border-width: 1rem;
+    border-color: #e8e8e8;
+    flex: 0 0 60%;
+    padding: 1em;
+    min-width: 360px; 
+    overflow-y: auto; 
+    max-height: calc(100vh - 3em); 
+}
+
+.grid-3col img:hover{
+    opacity: 0.5;
+}
+
+/* Needs to be sorted out into sections!!! */
+
+/* --- Header area --- */
+
+header {
+    /* background-color:#F2F2F2 ; */
+    margin: 0;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.head-grid{
+ 
+    justify-content:center;
+    align-items: center;
+    display: grid;
+    margin-right: 5px;
+    grid-template-columns: 7fr 1fr;
+}
+
+.profile-area{
+    max-width:250px ;
+    
+    min-width: 126px;
+    display: flex;
+    flex-wrap: wrap;
+    /* grid-template-columns: 0.4fr 1fr 1fr; */
+    /* flex-wrap: wrap; */
+    gap: 10px;
+    min-height: 50px;
+    align-content: center;
+    
+    color: #282828;
+    font-size: 16px;
+    font-weight: 700;
+    background-color: #e8e8e8;
+    padding: 10px;
+}
+
+#drop-area{
+    width: 100%;
+    height: 100%;
+}
+
+.grid-3col {
+    /* overflow-y: scroll; */
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1em;
+}
+
+.grid-item {
+    /* background-color: #f1f1f1; */
+    /* border: 1px solid #ccc; */
+    padding: 1em;
+    text-align: center;
+    width: 300px;
+    height: 300px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.grid-item img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+.grid-item.selected {
+    opacity: 0.5;
+    border: 10px solid #7187a6;
+    border-radius: 5px;
+}
+/* ----------------------------- */
+.copy-area{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-content: flex-start;
+    padding-top: 1em;
+
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: inner-spin-button;
+    display: inline-block;
+}
+
+.copy-area input[type=number]{
+    min-width:90px;
+    height: 30px;
+    font-weight: 700;
+    border: 3px solid #282828;
+    transition: 0.5s;
+    outline: none;
+    border-radius: 5px;
+
+}
+
+/* ----------copy url button------------ */
+
+.Copybutton {
+    background-color: #282828;
+    border: none;
+    color: white;
+    padding: 5px 5px;
+    height:30px;
+    min-width:90px;
+    border-radius: 5px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 700;
+    transition-duration: 0.2s;
+  }
+.Copybutton:hover{
+     background-color: #585858;
+     cursor: pointer;
+}
+
+.Copybutton:disabled{
+    background-color: #585858;
+    cursor: not-allowed;
+}
+
+
+/* ------------------ flip checkboxes--------------- */
+
+.flipvLabel {
+    min-width:90px;
+    height: 30px;
+    display: inline-block;
+    position: relative;
+    
+    cursor: pointer;
+    font-size: 16px;
+    user-select: none;
+}
+
+.flipvLabel input[type="checkbox"] {
+    display: none;
+}
+
+
+.flipvLabel::before {
+    content: "flip-v off";
+    font-family: "Open Sans", sans-serif;
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 30px; 
+    min-width:90px;  
+    border-radius: 5px;
+    background-color: #585858;
+   
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px; 
+    font-weight:700; 
+    color: #fff;
+    text-align: center;
+}
+
+
+.flipvLabel input[type="checkbox"]:checked + .flipvSpan::before {
+    background-color: #282828;
+    border-color: #282828;
+    color: white;
+}
+
+
+.flipvSpan::before {
+    
+    content: "flip-v on"; 
+    font-family: "Open Sans", sans-serif;
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    border-radius: 5px;
+    min-width:90px; 
+    height: 31px; 
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px; 
+    color: transparent;
+    transition: color 0.2s;
+}
+
+
+.flipvLabel input[type="checkbox"]:checked + .flipvSpan::before {
+    color: white;
+
+}
+
+
+.flipvSpan {
+ 
+    vertical-align: middle;
+}
+
+/* ------------------------------fliph----------- */
+.fliphLabel input[type="checkbox"] {
+    display: none;
+}
+.fliphLabel {
+    min-width:90px;
+    height: 30px;
+    display: inline-block;
+    position: relative;
+    padding-left: 80px; 
+    cursor: pointer;
+    font-size: 16px;
+    user-select: none;
+}
+
+.fliphLabel::before {
+    content: "flip-h off";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 30px; 
+    min-width:90px; 
+    border-radius: 5px;
+    background-color: #585858;
+    /* border: 1px solid #ccc; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px; 
+    font-weight: 700;
+    color: #fff;
+    text-align: center;
+}
+
+
+.fliphLabel input[type="checkbox"]:checked + .fliphSpan::before {
+    background-color: #282828;
+    border-color: #282828;
+    color: white;
+}
+
+
+.fliphSpan::before {
+    content: "flip-h on"; 
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    border-radius: 5px;
+    min-width:90px;
+    height: 31px; 
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px; 
+    color: transparent;
+    transition: color 0.2s;
+}
+
+
+.fliphLabel input[type="checkbox"]:checked + .fliphSpan::before {
+    color: white;
+}
+
+
+.fliphSpan {
+    padding-left: 10px;
+    vertical-align: middle;
+}
+
+
+/* -------------- custom checkbox--------------- */
+
+.customLabel input[type="checkbox"] {
+    display: none;
+}
+.customLabel {
+    min-width:90px;
+    height: 30px;
+    display: inline-block;
+    position: relative;
+    padding-left: 80px; 
+    cursor: pointer;
+    font-size: 16px;
+    user-select: none;
+}
+
+.customLabel::before {
+    content: "Default";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 30px; 
+    min-width:90px; 
+    border-radius: 5px;
+    background-color: #585858;
+    /* border: 1px solid #ccc; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px; 
+    font-weight: 700;
+    color: #fff;
+    text-align: center;
+}
+
+
+.customLabel input[type="checkbox"]:checked + .customSpan::before {
+    background-color: #282828;
+    border-color: #282828;
+    color: white;
+}
+
+
+.customSpan::before {
+    content: "Custom"; 
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    border-radius: 5px;
+    min-width:90px;
+    height: 30px; 
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px; 
+    color: transparent;
+    transition: color 0.2s;
+}
+
+
+.customLabel input[type="checkbox"]:checked + .customSpan::before {
+    color: white;
+}
+
+
+.customSpan {
+    padding-left: 10px;
+    vertical-align: middle;
+}
+/* -------------------------- */
+/* .wd{
+    padding-right: 20px;
+}
+.hi{
+    padding-right: 20px;
+}
+.wd::after{
+    content: "%";
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none; 
+}
+
+.hi::after{
+    content: "%";
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none; 
+/* ----------------- */
+
+@media (max-width: 1000px) {
+    .left-area, .right-area {
+        flex: 1 1 100%;
+    }
+
+    .right-area {
+        margin-top: 1em;
+    }
+    .grid-3col {
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    }
+
+    .grid-item {
+        width: 100px;
+        height: 100px; 
+    }
+
+    .grid-item img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain; 
+    }
+}

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="boostrap/css/bootstrap.css">
+  <link rel="stylesheet" href="login.css">
+
+  <title>derpic.login</title>
+</head>
+
+<body>
+  <div class="login-flex">
+    <div class="login-area">
+      <h1>derpic.login</h1>
+      <div class="login-grid" id="login-grid">
+
+        <div class="grid-col-span-2">
+          <input type="text" id="username" name="username" placeholder="Enter Username" maxlength="20" required>
+        </div>
+        <input type="password" id="token" name="token" placeholder="Enter Token" required>
+        <button class="showPWD" id="showPWD" onclick="showPWD()"><i class="glyphicon glyphicon-eye-open"
+            style="font-size: 18px;"></i></button>
+        <form id="login-info" class="grid-col-span-2">
+          <button type="submit" class="button">Login</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <script src="login.js"></script>
+</body>
+
+</html>

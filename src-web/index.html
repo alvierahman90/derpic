@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>derpic-test</title>
+  <link rel="stylesheet" href="/dash/styles.css">
+</head>
+
+<body>
+  <header>
+    <div class="head-grid">
+      <h1>derpic</h1>
+      <div class="profile-area" id="profile-area">
+        <label class="night-checkbox-container">
+          <input type="checkbox" id="night-checkbox" checked>
+          <span class="night-checkbox-text"></span>
+        </label>
+        <button class="logout-button" id="logoutButton">Logout</button>
+        <p id="username"></p>
+      </div>
+    </div>
+  </header>
+  <main class="content">
+    <section class="left-area" id="left-area">
+
+      <div class="grid-2x2" id="input-area">
+        <div class="input-box">
+          <label for="input-img" id="drop-area">
+            <input type="file" accept="image/*" id="input-img" hidden>
+            <div id="img-view">
+              <i class="fa-solid fa-image" style="font-size: 150px; font-family: Font Awesome 4 free" ;></i>
+              <p>Click here <br> to upload image</p>
+            </div>
+          </label>
+        </div>
+        <div class="copy-area">
+
+        </div>
+        <div class="info-area" id="info-area">
+          <pre id="metadata" class="bold-font">File Name:<br>File Size:<br>File Type:<br>Image Width:<br>Image Height:
+          </pre>
+        </div>
+        <div class="toolbar">
+          <div class="tools">
+            <label class="meta-checkbox-container">
+              <input type="checkbox" id="meta-checkbox" checked>
+              <span class="meta-checkbox-text"></span>
+            </label>
+
+            <button class="button" id="uploadButton" onclick="uploadImageAPI()" disabled>upload</button>
+
+            <button class="button" id="deleteButton" disabled>delete</button>
+
+          </div>
+
+        </div>
+    </section>
+
+    <section class="right-area" id="right-area">
+      <div class="grid-3col" id="galleryGrid">
+
+      </div>
+    </section>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
+  <script src="/dash/dash.js"></script>
+  <script src="https://kit.fontawesome.com/db8401126d.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</body>
+
+</html>

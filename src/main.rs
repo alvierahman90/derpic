@@ -438,6 +438,13 @@ async fn main() -> Result<(), std::io::Error> {
     poem::Server::new(TcpListener::bind("0.0.0.0:3000"))
         .run(
             Route::new()
+                .nest(
+                    "/dash",
+                    poem::endpoint::StaticFilesEndpoint::new(
+                        env::var("DERPIC_STATIC_FILES").unwrap_or("/opt/derpic/src-web".into()),
+                    )
+                    .index_file("index.html"),
+                )
                 .nest("/", api_service.with(Cors::new()))
                 .nest("/ui", ui_service),
         )

@@ -1,0 +1,117 @@
+body{
+    height: 100vh;
+    width: 100vw;
+    padding: 0px;
+    background-color: #F2F2F2;
+    font-family: "Open Sans", sans-serif;
+    color: #282828;
+    margin: 0;
+}
+
+h1{
+    font-size: 45px;
+    padding: 10px;
+    text-decoration: underline;
+    text-decoration-thickness: 5px;
+}
+
+input[type=text],input[type=password]{
+    width: 100%;
+    height: 40px;
+    font-weight: 700;
+    border: 3px solid #282828;
+    -webkit-transition: 0.5s;
+    transition: 0.5s;
+    outline: none;
+    border-radius: 5px;
+}
+
+
+input[type=text]:focus,[type=password]:focus {
+    border: 3px solid #e8e8e8;
+}
+
+.showPWD {
+    height: 40px;
+    background-color: #fff;
+    border: 3px solid #282828;
+    color: #282828;
+    transition: 0.5s;
+    border-radius: 5px;
+    
+}
+.showPWD:hover{
+
+    cursor: pointer;
+    border: 3px solid #e8e8e8;
+}
+
+.button {
+    background-color: #282828;
+    border: none;
+    color: white;
+    padding: 5px 5px;
+    height:35px;
+    width:100%;
+    border-radius: 5px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 700;
+    transition-duration: 0.2s;
+  }
+.button:hover{
+     background-color: #585858;
+     cursor: pointer;
+}
+
+.button:disabled{
+    background-color: #585858;
+    cursor: not-allowed;
+}
+
+.login-flex{
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-area{
+    display: flex;
+    flex-wrap: wrap;
+    padding-bottom: 200px;
+    justify-content: center;
+    align-content: center;
+    text-align: center;
+    min-height: 300px ;
+    max-width: 300px;
+    /* border: 5px solid #e8e8e8;
+    border-radius: 5px; */
+
+
+}
+
+.login-grid{
+    display: grid;
+    width: 88%;
+    grid-template-columns: 5fr 1fr;
+    /* margin-right: 20px; */
+    /* padding: 10px; */
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.grid-col-span-2{
+    grid-column: span 2;
+}
+
+
+/* -- error popup  */
+
+
+.changed {
+    border: 3px solid red;
+}
