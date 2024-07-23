@@ -10,7 +10,7 @@
    POSTGRES_HOST=db
    POSTGRES_DB=fel_dms
    DERPIC_ADMIN_TOKEN=changeme
-   DERPIC_PUBLIC_BASE_URL=https://i.dev.alv.cx/
+   DERPIC_PUBLIC_BASE_URL=https://i.dev.alv.cx
    ```
 
 2. `docker compose up -d --build`

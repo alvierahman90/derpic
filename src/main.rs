@@ -2,11 +2,10 @@ use diesel::result::Error as DieselError;
 use dotenvy::dotenv;
 use poem::{
     error::{InternalServerError, NotFoundError},
-    get, handler,
     listener::TcpListener,
     middleware::Cors,
     web::Redirect,
-    EndpointExt, Result, Route,
+    EndpointExt, IntoResponse, Result, Route,
 };
 use poem_openapi::{
     param::Header, param::Path, param::Query, payload::Binary, payload::Json, ApiResponse, Object,
@@ -77,13 +76,17 @@ fn check_admin_token(token: &str) -> bool {
     token == derpic::env::admin_token()
 }
 
-#[handler]
-async fn index_redirect() -> Redirect {
-    Redirect::moved_permanent(format!("{}/dash", derpic::env::public_base_url()))
-}
-
 #[OpenApi]
 impl Api {
+    #[oai(path = "/", method = "get")]
+    async fn index_redirect(&self) -> poem::Result<()> {
+        Err(poem::error::Error::from_response(
+            IntoResponse::into_response(Redirect::moved_permanent(format!(
+                "{}/dash",
+                derpic::env::public_base_url()
+            ))),
+        ))
+    }
     #[oai(path = "/admin/tokens", method = "get")]
     async fn get_admin_tokens(
         &self,
@@ -444,7 +447,6 @@ async fn main() -> Result<(), std::io::Error> {
                         .index_file("index.html"),
                 )
                 .nest("/", api_service.with(Cors::new()))
-                .at("/", get(index_redirect))
                 .nest("/ui", ui_service),
         )
         .await
