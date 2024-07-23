@@ -1,6 +1,7 @@
-const apiUrl = new URL(window.location.href);
-apiUrl.path = '/i';
-const apiUrl = apiUrl.href;
+const localUrl = new URL(window.location.href);
+localUrl.path = '/me';
+localUrl.pathname = '/me';
+const apiUrl = localUrl.href;
 
 const loginGrid = document.getElementById("login-grid");
 

@@ -2,9 +2,10 @@
 const token = getCookie("token");
 const username = getCookie("user");                      //sets the token and username from cookies
 
-const apiUrl = new URL(window.location.href);
-apiUrl.path = '/i';
-const apiUrl = apiUrl.href;
+const localUrl = new URL(window.location.href);
+localUrl.path = '/i';
+localUrl.pathname = '/i';
+const apiUrl = localUrl.href;
 
 const apiKey = `${token}`;
 
@@ -670,7 +671,7 @@ document.getElementById('logoutButton').addEventListener('click', function() {
     deleteCookie('username');
     deleteCookie('token');
   
-    window.location.href = '/derpic/derpic-login/derpic-login.html';
+    window.location.href = '/dash/login';
 });
 
 //--------- adjustment of font size for info-area -------------
