@@ -2,15 +2,16 @@ use diesel::result::Error as DieselError;
 use dotenvy::dotenv;
 use poem::{
     error::{InternalServerError, NotFoundError},
+    get, handler,
     listener::TcpListener,
     middleware::Cors,
+    web::Redirect,
     EndpointExt, Result, Route,
 };
 use poem_openapi::{
     param::Header, param::Path, param::Query, payload::Binary, payload::Json, ApiResponse, Object,
     OpenApi, OpenApiService,
 };
-use std::env;
 
 use derpic::models::*;
 
@@ -72,17 +73,13 @@ struct ImageFilters {
     rotate: Option<i32>,
 }
 
-const DERPIC_ADMIN_TOKEN: &str = "DERPIC_ADMIN_TOKEN";
-const DERPIC_PUBLIC_BASE_URL: &str = "DERPIC_PUBLIC_BASE_URL";
-
 fn check_admin_token(token: &str) -> bool {
-    match env::var(DERPIC_ADMIN_TOKEN) {
-        Err(e) => {
-            log::error!("{e}");
-            false
-        }
-        Ok(admin_token) => token == admin_token,
-    }
+    token == derpic::env::admin_token()
+}
+
+#[handler]
+async fn index_redirect() -> Redirect {
+    Redirect::moved_permanent(format!("{}/dash", derpic::env::public_base_url()))
 }
 
 #[OpenApi]
@@ -426,15 +423,16 @@ impl Api {
 async fn main() -> Result<(), std::io::Error> {
     dotenv().ok();
     env_logger::init();
-    log::info!("DERPIC_STATIC_FILES={}", derpic::static_files_directory());
+    log::info!(
+        "DERPIC_STATIC_FILES={}",
+        derpic::env::static_files_directory()
+    );
 
     let conn = &mut derpic::db::establish_connection();
     derpic::db::run_migrations(conn).unwrap();
 
-    let api_service = OpenApiService::new(Api, "derpic", "0.1").server(
-        env::var(DERPIC_PUBLIC_BASE_URL)
-            .expect("DERPIC_PUBLIC_BASE_URL environment variable not defined"),
-    );
+    let api_service =
+        OpenApiService::new(Api, "derpic", "0.1").server(derpic::env::public_base_url());
     let ui_service = api_service.openapi_explorer();
 
     poem::Server::new(TcpListener::bind("0.0.0.0:3000"))
@@ -442,10 +440,11 @@ async fn main() -> Result<(), std::io::Error> {
             Route::new()
                 .nest(
                     "/dash",
-                    poem::endpoint::StaticFilesEndpoint::new(derpic::static_files_directory())
+                    poem::endpoint::StaticFilesEndpoint::new(derpic::env::static_files_directory())
                         .index_file("index.html"),
                 )
                 .nest("/", api_service.with(Cors::new()))
+                .at("/", get(index_redirect))
                 .nest("/ui", ui_service),
         )
         .await
