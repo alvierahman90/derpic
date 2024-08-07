@@ -38,13 +38,13 @@ jobs:
       uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
       with:
         context: .
+        platforms: linux/amd64,linux/arm64,linux/arm/v7
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
     - name: Generate artifact attestation
       uses: actions/attest-build-provenance@v1
       with:
-        platforms: linux/amd64,linux/arm64,linux/arm/v7
         subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME}}
         subject-digest: ${{ steps.push.outputs.digest }}
         push-to-registry: true
