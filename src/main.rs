@@ -82,7 +82,7 @@ impl Api {
     async fn index_redirect(&self) -> poem::Result<()> {
         Err(poem::error::Error::from_response(
             IntoResponse::into_response(Redirect::moved_permanent(format!(
-                "{}/dash",
+                "{}dash",
                 derpic::env::public_base_url()
             ))),
         ))
