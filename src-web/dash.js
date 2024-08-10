@@ -37,7 +37,7 @@ function loadGallery(){
     fetch(apiUrl, requestOptions)
     .then(response => {
         if (!response.ok) {
-        window.location.href = "/derpic/derpic-login/derpic-login.html";
+        window.location.href = "/dash/login";
         throw new Error('Network response was not ok');
        
         }
