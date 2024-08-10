@@ -13,10 +13,14 @@ const dropArea = document.getElementById("drop-area");    // setting global area
 const inputFile = document.getElementById("input-img");
 const imageView = document.getElementById("img-view");
 
+let selectedItems;
+let clickedItem = null;
 let selectedItem = null;
 let slug = "";
 let liveSlug = "";
-
+const confirmationModal = document.getElementById('confirmationModal');
+const confirmDeleteBtn = document.getElementById('confirmDelete');
+const cancelDeleteBtn = document.getElementById('cancelDelete');
 
 loadGallery();      // calls load gallery before anything.
 
@@ -33,7 +37,7 @@ function loadGallery(){
     fetch(apiUrl, requestOptions)
     .then(response => {
         if (!response.ok) {
-        window.location.href = "/dash/login";
+        window.location.href = "/derpic/derpic-login/derpic-login.html";
         throw new Error('Network response was not ok');
        
         }
@@ -41,10 +45,6 @@ function loadGallery(){
     })
     .then(data => {
         document.getElementById('galleryGrid').innerHTML = ""
-        // let slug = data[0].slug;
-        // let id = data[0].id;
-        // console.log(data.length);
-        // console.log(slug, id);
         for(let i = 0; i < data.length; i++){
             imgDataStorage = `${apiUrl}/${data[i].slug}`     //using the token iterates through the data and displays the images in the gallery hosted from the backend
             const img = document.createElement('img');
@@ -53,10 +53,27 @@ function loadGallery(){
             const cell = document.createElement('div');
             cell.className = 'grid-item';
             cell.id = `grid-item-slug-${data[i].slug}`;
-            cell.appendChild(img);
-            document.getElementById('galleryGrid').appendChild(cell);
+            const spinner = document.createElement('div');
+            spinner.className = 'loading-spinner';
 
+            cell.appendChild(spinner);
+            document.getElementById('galleryGrid').appendChild(cell);
+            // Once the image is loaded, remove the spinner and add the image to the cell
+            img.onload = function() {
+                spinner.remove();
+                cell.appendChild(img);
+            };
+
+            // Handle image loading error
+            img.onerror = function() {
+                spinner.remove();
+                cell.innerHTML = '<p>Failed to load image</p>';
+            };
+            selectedItems = [];
         }
+        
+        
+        
     })
     .catch(error => {
         console.error('Error:', error);
@@ -68,13 +85,10 @@ function loadGallery(){
 
 
 function uploadImageAPI(){
-
+        
         const file = inputFile.files[0];
         console.log(`Selected file: ${file.name}, type: ${file.type}, size: ${file.size} bytes`);
         if (file) {
-
-            // const formData = new FormData();
-            // formData.append('file',file);
 
             const requestOptions = {
             method: 'POST',
@@ -82,7 +96,6 @@ function uploadImageAPI(){
                 'Accept': 'application/json',
                 'X-Derpic-Token': `${apiKey}`,
                 'Content-Type': 'application/octet-stream'
-
             },
             body: file
             };
@@ -95,15 +108,19 @@ function uploadImageAPI(){
                 return response.json();
             })
             .then(data => {
+
+                selectedItems = [];
+                document.querySelectorAll('.grid-item.selected').forEach(item => item.classList.remove('selected'));
+
                 console.log(data);
                 loadGallery();
                 localStorage.removeItem('imageData');
                 document.getElementById('uploadButton').disabled = true;
                 document.getElementById('input-img').value = '';
                 resetDropArea();
-                displayMetadata();
                 const metadataElement = document.getElementById('metadata');
                 metadataElement.innerHTML = "File Name:<br>File Size:<br>File Type:<br>Image Width:<br>Image Height:";
+                
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -112,6 +129,7 @@ function uploadImageAPI(){
         else{
             console.error("No file selected");
         }
+        
     }
 
 
@@ -119,9 +137,9 @@ function uploadImageAPI(){
 
 //----------------- API fetch DELETE to remove images -------------
 
-function deleteImageAPI(){
+function deleteImageAPI(delSlug){
 
-    if (!slug) {
+    if (!delSlug) {
         console.error('No slug available for deletion.');
         return;
     }
@@ -133,7 +151,7 @@ function deleteImageAPI(){
         },
         };
     
-        fetch(`${apiUrl}/${slug}`, requestOptions)
+        fetch(`${apiUrl}/${delSlug}`, requestOptions)
         .then(response => {
             if (!response.ok) {
             throw new Error('Network response was not ok');
@@ -153,7 +171,7 @@ function deleteImageAPI(){
 
 
 
-//----------Displays the file info on input-----------
+//---------- Displays the file info on input -----------
 
 
 
@@ -192,9 +210,8 @@ document.getElementById('input-img').addEventListener('change', function(event) 
 // ------------uploadImage function sets image as background--------
 
 function uploadImage(){
-    selectedItem = null;
     slug = "";
-    
+    clearDisplayCopyImg();
     let imgLink = URL.createObjectURL(inputFile.files[0]);
     imageView.textContent = "";
     const pic = document.createElement("div");
@@ -205,15 +222,10 @@ function uploadImage(){
     pic.appendChild(picture);
     imageView.appendChild(pic);
     imageView.style.border = 0;
-    
-    clearDisplayCopyImg();
+
 }
 
 // ---------- display metadata (file info) when upload -------
-function displayMetadata(tags) {
-    const metadataElement = document.getElementById('metadata');
-    metadataElement.textContent = JSON.stringify(tags, null, 2);
-}
 
 // ---------- async function to get selcted img blob and display info such as slug -------------
 async function getImageFile() {
@@ -229,13 +241,26 @@ async function getImageFile() {
                 throw new Error('Network response was not ok');
             }
             const blob = await response.blob();
-
+            console.log(blob);
             const urlParts = imgUrl.split('/');
             const filename = urlParts[urlParts.length - 1];
 
             const file = new File([blob], filename, { type: blob.type });
 
-            metadataElement.textContent = `Slug: ${file.name}\nFile Size: ${file.size} bytes\nFile Type: ${file.type}`;
+            // Create a temporary image element to get the dimensions
+            const tempImg = new Image();
+            tempImg.src = imgUrl;
+            tempImg.onload = () => {
+                const width = tempImg.width;
+                const height = tempImg.height;
+                
+                metadataElement.textContent = `Slug: ${file.name}\nFile Size: ${file.size} bytes\nFile Type: ${file.type}\nImage Width: ${width}px\nImage Height: ${height}px`;
+            };
+            
+            tempImg.onerror = () => {
+                console.error('Error loading image for dimensions');
+                metadataElement.textContent = `Slug: ${file.name}\nFile Size: ${file.size} bytes\nFile Type: ${file.type}\nImage Width: Error \nImage Height: Error`;
+            };
         } catch (error) {
             console.error('Error fetching image:', error);
             metadataElement.textContent = 'Error fetching image';
@@ -256,106 +281,141 @@ const rightArea = document.getElementById("right-area");
 const inputArea = document.getElementById("input-area");
 const gridItem = document.getElementById("grid-item");
 const profileArea = document.getElementById("profile-area");
-
+const modalContent = document.getElementById("modal-content");
+const footerArea = document.getElementById("footer");
+theme();
 document.addEventListener('DOMContentLoaded', (event) => {
     const nightCheckbox = document.getElementById('night-checkbox');
 
     nightCheckbox.addEventListener('change', function() {
         if (nightCheckbox.checked) {
-            lightMode();
+            // lightMode();
+            deleteCookie("theme");
+            document.cookie = "theme=light; path=/; SameSite = Strict`";
+            theme();
+            
+            //set lightmode cookie
+            //delete night cookie
         }
         else{
-            nightMode();
+            // nightMode();
+            deleteCookie("theme");
+            document.cookie = "theme=night; path=/; SameSite = Strict`";
+            // set night cookie
+            // delete light cookie
+            theme();
         } 
         });
     });
 // ----------------- night and light mode ------------------//
-
-function nightMode(){
-    document.body.style = "color: #f2f2f2; background-color: #282828";
-    leftArea.style = "background-color: #383838";
-    rightArea.style = "background-color: #282828; border-color: #383838";
-    inputArea.style = "background-color: #383838 ;color: #f2f2f2;";
-    profileArea.style = "background-color: #383838; color: #f2f2f2"
+function theme(){
+    const nightCheckbox = document.getElementById('night-checkbox');
+    let theme = getCookie("theme");
+    if(theme === "light"){
+        nightCheckbox.checked = true;
+        document.body.style = "color: #282828";
+        leftArea.style = "background-color: #e8e8e8";
+        rightArea.style = "background-color: #f2f2f2";                              // setting dark and light mode (super botch but cba to change)
+        inputArea.style = "background-color: #e8e8e8 ;color: #282828;";
+        profileArea.style = "background-color: #e8e8e8; color: #282828";
+        modalContent.style = "background-color: #e8e8e8";
+    
+        footerArea.style = "background-color: #e8e8e8; color: #585858"
+    }
+    else if(theme === "night"){
+        nightCheckbox.checked = false;
+        document.body.style = "color: #f2f2f2; background-color: #282828";
+        leftArea.style = "background-color: #383838";
+        rightArea.style = "background-color: #282828; border-color: #383838";
+        inputArea.style = "background-color: #383838 ;color: #f2f2f2;";
+        profileArea.style = "background-color: #383838; color: #f2f2f2";
+        modalContent.style = "background-color: #383838";
+    
+        footerArea.style = "background-color: #383838; color: #a8a8a8";
+    }
 }
 
-function lightMode(){
-    console.log("light");
-    document.body.style = "color: #282828";
-    leftArea.style = "background-color: #e8e8e8";
-    rightArea.style = "background-color: #f2f2f2";                              // setting dark and light mode (super botch but cba to change)
-    inputArea.style = "background-color: #e8e8e8 ;color: #282828;";
-    profileArea.style = "background-color: #e8e8e8; color: #282828"
-}
 
 // --------------------------- DELETE FUNCTIONALITY--------//
 
 // firstly we create a selected item function and class to apply css and gather info
 
-    document.addEventListener('DOMContentLoaded', () => {
-        const grid = document.getElementById('galleryGrid');
-        const deleteBtn = document.getElementById('deleteButton');
-        let selectedItem = null;
-    
- 
-        grid.addEventListener('click', function(event) {
-            if (event.target.classList.contains('grid-item') || event.target.closest('.grid-item')) {
-                let previouslySelectedItem = document.querySelector('.grid-item.selected');
-                selectedItem = event.target.closest('.grid-item');
-                if (event.target.closest(".selected")) {
-        
-                    selectedItem.classList.remove('selected');
-                    selectedItem = null;
+// fix selected items showing....
+
+//make sure you cant copy URL for multidelete
+
+// make the images show for multidelete...............
+
+document.addEventListener('DOMContentLoaded', () => {
+    const grid = document.getElementById('galleryGrid');
+    const deleteBtn = document.getElementById('deleteButton');
+    let selectedItems = [];
+
+    grid.addEventListener('click', function(event) {
+        if (event.target.classList.contains('grid-item') || event.target.closest('.grid-item')) {
+            clickedItem = event.target.closest('.grid-item');
+            const slugId = clickedItem.id;
+            const parts = slugId.split("-");
+            const slug = parts.slice(3).join("-");
+
+            if (clickedItem.classList.contains('selected')) {
+                clickedItem.classList.remove('selected');
+                selectedItems = selectedItems.filter(item => item !== slug);
+                if (selectedItems.length === 0) {
                     document.getElementById('deleteButton').disabled = true;
-                    clearSelectedPopup();
-                    clearDisplayCopyImg();
                 }
-                else if (!event.target.closest(".selected")){
-                    
-                    if (previouslySelectedItem) {
-                        previouslySelectedItem.classList.remove('selected');
-                    }
-                    selectedItem = event.target.closest('.grid-item');
-                    selectedItem.classList.add('selected');
-                    const slugId = selectedItem.id;
-                    const parts = slugId.split("-");
-                    slug = parts.slice(3).join("-");
-                    console.log(slug);
-                    selectedPopup();
-                    getImageFile();
-                    clearDisplayCopyImg();
-                    displayCopyImg();
-                    document.getElementById('deleteButton').disabled = false;
-                    
-                }
-
-
-
-                // ---------- send the selected photo to the img-veiw window
-              
-                // ----------
+            } else {
+                clickedItem.classList.add('selected');
+                selectedItems.push(slug);
+                document.getElementById('deleteButton').disabled = false;
             }
-        });
+
+            console.log(selectedItems);
+            
+            if (selectedItems.length > 0) {
+                selectedPopup();
+                getImageFile();
+            } else {
+                clearSelectedPopup();
+                clearDisplayCopyImg();
+            }
+        }
+        slug = selectedItems[0];
+    });
+
+    
+       
 
 // ----------- selected item popup -------------//
 
 function selectedPopup(){
-    document.getElementById('uploadButton').disabled = true;
-    let imgElement = selectedItem.children[0];
-    let imgLink = imgElement.getAttribute('src');
-    imageView.textContent = "";
-    imageView.style.border = 0;
-    const pic = document.createElement("div");
-    pic.className = "mainPic";
-    pic.id = "mainPic";
-    let picture = document.createElement("img");
-    picture.id = "imgElement";
-    picture.src = imgLink;
-    pic.appendChild(picture);
-    
-    imageView.appendChild(pic);
+    if(selectedItems.length === 1){
+        clearDisplayCopyImg();
+        displayCopyImg();
+        console.log("one");
+        document.getElementById('uploadButton').disabled = true;
+
+        imageView.textContent = "";
+        imageView.style.border = 0;
+        const pic = document.createElement("div");
+        pic.className = "mainPic";
+        pic.id = "mainPic";
+        let picture = document.createElement("img");
+        picture.id = "imgElement";
+        picture.src = `${apiUrl}/${selectedItems[0]}`;
+        pic.appendChild(picture);
+        imageView.appendChild(pic);
+    }
+    else if(selectedItems.length > 1){
+        clearSelectedPopup();
+        clearDisplayCopyImg();
+        console.log("multi");
+        document.getElementById('uploadButton').disabled = true;
+        imageView.innerHTML = "<i class='fa-regular fa-images' style='font-size: 150px'></i><p>Multiple images selected</p>";
+    }
     
 }
+
 // -------------- selected popup from slug -------------
 function selectedPopupFromSlug(liveSlug){
     imageView.textContent = "";
@@ -387,6 +447,8 @@ function displayCopyImg(){
     const fliphLabel = document.createElement("label");
     customLabel.classList.add("customLabel");
     fliphLabel.classList.add("fliphLabel");
+    fliphLabel.id = "fliphLabel";
+    flipvLabel.id = "flipvLabel";
     flipvLabel.classList.add("flipvLabel");
    
    
@@ -478,6 +540,8 @@ function displayCopyImg(){
             const fliphSpan = document.createElement("span");
             flipvSpan.classList.add("flipvSpan");
             fliphSpan.classList.add("fliphSpan");
+            flipvSpan.id = "flipvSpan";
+            fliphSpan.id = "fliphSpan";
             flipvLabel.appendChild(flipv);
             fliphLabel.appendChild(fliph);
             fliphInnerLabel.appendChild(fliphSpan);
@@ -521,14 +585,20 @@ function displayCopyImg(){
             flipvCB.addEventListener("input", updateImgLive);
             }   
         else{
-            selectedPopupFromSlug(`${apiUrl}/${slug}`);
+
+            selectedPopupFromSlug(`${apiUrl}/${selectedItems[0]}`);
             document.getElementById("rt")?.remove();
             document.getElementById("wd")?.remove();
             document.getElementById("hi")?.remove();
             document.getElementById("fv")?.remove();
             document.getElementById("fh")?.remove();
-            flipvLabel.remove();
-            fliphLabel.remove();
+            flipvSpan = document.getElementById("flipvSpan");
+            fliphSpan =  document.getElementById("fliphSpan");
+            document.getElementById("flipvLabel")?.removeChild(flipvSpan);
+            document.getElementById("fliphLabel")?.removeChild(fliphSpan);
+            document.getElementById("fliphLabel")?.remove();
+            document.getElementById("flipvLabel")?.remove();
+            
         }
 
     }
@@ -609,29 +679,45 @@ function displayCopyImg(){
 
 // delete button function calls the deleteImageAPI and resets the area and selected item.
         deleteBtn.addEventListener('click', function() {
-            if (selectedItem) {
-                grid.removeChild(selectedItem);
-                selectedItem = null;
+            if(selectedItems.length === 0){
+                alert("Select img to delete");
+            }
+            else if(selectedItems.length === 1){
                 clearDisplayCopyImg();
                 deleteImageAPI();
                 resetDropArea();
-            } else {
-                alert('Please select an item to delete.');
+                for(i = 0; i < selectedItems.length; i++){
+                    deleteImageAPI(selectedItems[i]);
+            
+                }
+                selectedItems = [];
+               
+            }
+            else if(selectedItems.length > 1){
+                confirmationModal.style.display = 'flex';
+                // grid.removeChild(selectedItem);
+                // selectedItem = null;
+                confirmDeleteBtn.addEventListener('click', function() {
+                clearDisplayCopyImg();
+                deleteImageAPI();
+                resetDropArea();
+                for(i = 0; i < selectedItems.length; i++){
+                    deleteImageAPI(selectedItems[i]);
+            
+                }
+                selectedItems = [];
+                confirmationModal.style.display = 'none';
+            });
+            cancelDeleteBtn.addEventListener('click', function() {
+                confirmationModal.style.display = 'none';
+            });
             }
         });
      });
 //---------------------- function  that resets the img-view area ------------------------------
 
     function resetDropArea(){
-        var parentDiv = document.getElementById('img-view');
-        var childDiv = document.getElementById('mainPic');
-      
-       
-        if (parentDiv && childDiv) {
-          parentDiv.removeChild(childDiv);
-        } else {
-          console.error('Parent or child div not found!');
-        }
+    
         imageView.innerHTML = "<i class='fa fa-photo' style='font-size: 150px';></i><p>Click here <br> to upload image</p>";
         imageView.style.border = "2px dashed #a8a8a8";
        
@@ -722,7 +808,7 @@ function copyURL(){
         }
         else{
             // alert the user to pick a rotation between 0 and 360 (step of 90)
-            rotation.style = "border: 2px solid #d45500";
+            rotation.style = "border: 2px solid darkred";
             setTimeout(() => {
                 rotation.style = "border: 3px solid #282828";
             }, 1500);
@@ -731,7 +817,7 @@ function copyURL(){
             widthpx = calculateWidth(originWidth,width.value);
         }
         else{
-            width.style = "border: 2px solid #d45500";
+            width.style = "border: 2px solid darkred";
             setTimeout(() => {
                 width.style = "border: 3px solid #282828";
             }, 1500);
@@ -741,7 +827,7 @@ function copyURL(){
             heightpx = calculateHeight(originHeight,height.value);
         }
         else{
-            height.style = "border: 2px solid #d45500";
+            height.style = "border: 2px solid darkred";
             setTimeout(() => {
                 height.style = "border: 3px solid #282828";
             }, 1500);
@@ -764,7 +850,7 @@ function copyURL(){
         let copyURL = `${apiUrl}/${slug}?rotation=${rotationdeg}&width=${widthpx}&height=${heightpx}&flipv=${flipvBool}&fliph=${fliphBool}`;
         
         navigator.clipboard.writeText(copyURL).then(function() {
-            alert("URL copied to clipboard");
+           copyPopup();
         }, function(err){
             console.error("Could not copy text: ", err);
         });
@@ -777,7 +863,7 @@ function copyURL(){
     else{
         let copyURL = `${apiUrl}/${slug}`;
         navigator.clipboard.writeText(copyURL).then(function() {
-            alert("URL copied to clipboard");
+            copyPopup();
         }, function(err){
             console.error("Could not copy text: ", err);
         });
@@ -828,3 +914,26 @@ function calculateHeight(originHeight, heightIn){
 }
 
 // needs a major overhaul but its a WIP!
+
+//---------- copy popup function -----
+
+function copyPopup(){
+    const gridContainer = document.querySelector('.copy-area');
+    const copyPop = document.createElement("p");
+    copyPop.classList.add("copyPopup");
+    if (gridContainer.querySelector(".copyPopup")){
+        return
+    }
+    else{
+
+    
+    const copyPop = document.createElement("p");
+    copyPop.classList.add("copyPopup");
+    copyPop.textContent = "URL Copied"
+    gridContainer.appendChild(copyPop);
+
+    setTimeout(() => {
+        gridContainer.removeChild(copyPop);
+    }, 1000);
+}
+}
