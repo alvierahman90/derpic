@@ -23,8 +23,16 @@ pub mod env {
     }
 
     pub fn public_base_url() -> String {
-        env::var("DERPIC_PUBLIC_BASE_URL")
-            .expect("DERPIC_PUBLIC_BASE_URL environment variable not defined")
+        let url = env::var("DERPIC_PUBLIC_BASE_URL")
+            .expect("DERPIC_PUBLIC_BASE_URL environment variable not defined");
+        match url
+            .chars()
+            .next_back()
+            .expect("Unable to read DERPIC_PUBLIC_BASE_URL: failed to get last character")
+        {
+            '/' => url,
+            _ => format!("{url}/"),
+        }
     }
 
     pub fn admin_token() -> String {
