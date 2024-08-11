@@ -85,6 +85,10 @@ function loadGallery(){
 
 
 function uploadImageAPI(){
+        // ensure that there will be no differences between visual hints and actual selectedItems
+        // if user uploads new image with some items selected
+        // https://github.com/alvierahman90/derpic/issues/2
+        selectedItems = [];
         
         const file = inputFile.files[0];
         console.log(`Selected file: ${file.name}, type: ${file.type}, size: ${file.size} bytes`);
