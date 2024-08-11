@@ -13,7 +13,7 @@ const dropArea = document.getElementById("drop-area");    // setting global area
 const inputFile = document.getElementById("input-img");
 const imageView = document.getElementById("img-view");
 
-let selectedItems;
+let selectedItems = [];
 let clickedItem = null;
 let selectedItem = null;
 let slug = "";
@@ -353,7 +353,7 @@ function theme(){
 document.addEventListener('DOMContentLoaded', () => {
     const grid = document.getElementById('galleryGrid');
     const deleteBtn = document.getElementById('deleteButton');
-    let selectedItems = [];
+    selectedItems = [];
 
     grid.addEventListener('click', function(event) {
         if (event.target.classList.contains('grid-item') || event.target.closest('.grid-item')) {
