@@ -4,11 +4,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>derpic-test</title>
+  <title>derpic</title>
   <link rel="stylesheet" href="/dash/styles.css">
 </head>
 
 <body>
+
+  <div id="confirmationModal" class="modal">
+    <div class="modal-content" id="modal-content">
+        <p>Delete multiple images?</p>
+        <button id="confirmDelete" class="button confirm">Yes</button>
+        <button id="cancelDelete" class="button cancel">No</button>
+    </div>
+</div>
+
   <header>
     <div class="head-grid">
       <h1>derpic</h1>
@@ -43,11 +52,11 @@
           </pre>
         </div>
         <div class="toolbar">
-          <div class="tools">
-            <label class="meta-checkbox-container">
+        <div class="tools">
+            <!-- <label class="meta-checkbox-container">
               <input type="checkbox" id="meta-checkbox" checked>
               <span class="meta-checkbox-text"></span>
-            </label>
+            </label>  -->
 
             <button class="button" id="uploadButton" onclick="uploadImageAPI()" disabled>upload</button>
 
@@ -64,6 +73,15 @@
       </div>
     </section>
   </main>
+  <footer>
+    <div class="footer-flex" id="footer">
+        <a href = "/dash/derpic-about/">about</a>
+      
+        <a href = "/dash/derpic-contact/">contact</a>
+      
+        <!-- <a href = "/dash/derpic-privacy/">privacy</a> -->
+    </div>
+</footer>
   <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
   <script src="/dash/dash.js"></script>
   <script src="https://kit.fontawesome.com/db8401126d.js" crossorigin="anonymous"></script>
