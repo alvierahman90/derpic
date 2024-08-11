@@ -13,11 +13,7 @@ const dropArea = document.getElementById("drop-area");    // setting global area
 const inputFile = document.getElementById("input-img");
 const imageView = document.getElementById("img-view");
 
-<<<<<<< HEAD
-let selectedItems;
-=======
 let selectedItems = [];
->>>>>>> 9737613d270af3651ebf6f5ada2e8659ef46735d
 let clickedItem = null;
 let selectedItem = null;
 let slug = "";
@@ -89,13 +85,10 @@ function loadGallery(){
 
 
 function uploadImageAPI(){
-<<<<<<< HEAD
-=======
         // ensure that there will be no differences between visual hints and actual selectedItems
         // if user uploads new image with some items selected
         // https://github.com/alvierahman90/derpic/issues/2
         selectedItems = [];
->>>>>>> 9737613d270af3651ebf6f5ada2e8659ef46735d
         
         const file = inputFile.files[0];
         console.log(`Selected file: ${file.name}, type: ${file.type}, size: ${file.size} bytes`);
@@ -360,11 +353,7 @@ function theme(){
 document.addEventListener('DOMContentLoaded', () => {
     const grid = document.getElementById('galleryGrid');
     const deleteBtn = document.getElementById('deleteButton');
-<<<<<<< HEAD
-    let selectedItems = [];
-=======
     selectedItems = [];
->>>>>>> 9737613d270af3651ebf6f5ada2e8659ef46735d
 
     grid.addEventListener('click', function(event) {
         if (event.target.classList.contains('grid-item') || event.target.closest('.grid-item')) {
