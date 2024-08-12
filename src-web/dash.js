@@ -795,7 +795,7 @@ function copyURL(){
         if(rotation.value != "" && allowedValues.includes(rotvalue)){
             para.push(`rotation=${rotation.value}`);
         }
-        else{
+        else if(!(allowedValues.includes(rotvalue))){
             // alert the user to pick a rotation between 0 and 360 (step of 90)
             rotation.style = "border: 2px solid darkred";
             setTimeout(() => {
@@ -806,7 +806,7 @@ function copyURL(){
             widthpx = calculateWidth(originWidth,width.value);
             para.push(`width=${widthpx}`);
         }
-        else{
+        else if(width.value < 5){
             width.style = "border: 2px solid darkred";
             setTimeout(() => {
                 width.style = "border: 3px solid #282828";
@@ -818,7 +818,7 @@ function copyURL(){
             para.push(`height=${heightpx}`);
         }
         
-        else{
+        else if(height.value < 5){
             height.style = "border: 2px solid darkred";
             setTimeout(() => {
                 height.style = "border: 3px solid #282828";
