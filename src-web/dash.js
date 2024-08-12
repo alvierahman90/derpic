@@ -479,7 +479,7 @@ function selectedPopupFromSlug(liveSlug) {
 
     let picture = document.createElement("img");
     picture.id = "imgElement";
-    picture.src = `${apiUrl}/${selectedItems[0]}`;
+    picture.src = liveSlug;
     
     picture.onload = function() {
         hasLoaded = true;
