@@ -837,17 +837,18 @@ function copyURL(){
 
         if(para.length > 0){
         copyURL += `?${para.join('&')}`;
-        
+        }
+
         navigator.clipboard.writeText(copyURL).then(function() {
            copyPopup();
+           copyURL = `${apiUrl}/${slug}`;
+           para = [];
         }, function(err){
             console.error("Could not copy text: ", err);
         });
 
-        }   
-        else {
-            return;
-        }
+           
+
     }
     else{
         copyURL = `${apiUrl}/${slug}`;
