@@ -402,41 +402,41 @@ function selectedPopup(){
         imageView.textContent = "";
         imageView.style.border = 0;
         
-        // Create spinner element
+      
         const spinner = document.createElement("div");
         spinner.className = "loading-spinner";
         
-        // Create a div to hold the picture
+       
         const pic = document.createElement("div");
         pic.className = "mainPic";
         pic.id = "mainPic";
         
-        // Create image element
+       
         let picture = document.createElement("img");
         picture.id = "imgElement";
         picture.src = `${apiUrl}/${selectedItems[0]}`;
         
-        // Flag to check if image has loaded or errored
+        
         let imageLoadedOrErrored = false;
         
-        // Set a timeout to show the spinner if the image hasn't loaded in 500ms
+      
         const spinnerTimeout = setTimeout(() => {
             if (!imageLoadedOrErrored) {
                 imageView.appendChild(spinner);
             }
         }, 500);
         
-        // Handle image load success
+       
         picture.onload = function() {
-            imageLoadedOrErrored = true; // Mark that image has loaded successfully
-            clearTimeout(spinnerTimeout); // Clear the spinner timeout
+            imageLoadedOrErrored = true; 
+            clearTimeout(spinnerTimeout); 
         
-            // Remove the spinner if it was added
+            
             if (imageView.contains(spinner)) {
                 imageView.removeChild(spinner);
             }
         
-            // Append the image to the container
+           
             pic.appendChild(picture);
             imageView.appendChild(pic);
         }
@@ -469,30 +469,46 @@ function selectedPopupFromSlug(liveSlug) {
 
     imageView.textContent = "";
     imageView.style.border = 0;
-
     
+  
     const spinner = document.createElement("div");
     spinner.className = "loading-spinner";
-    imageView.appendChild(spinner);
-
-  
+    
+   
     const pic = document.createElement("div");
     pic.className = "mainPic";
     pic.id = "mainPic";
-
-
+    
+   
     let picture = document.createElement("img");
     picture.id = "imgElement";
     picture.src = liveSlug;
-
+    
+    
+    let imageLoadedOrErrored = false;
+    
+  
+    const spinnerTimeout = setTimeout(() => {
+        if (!imageLoadedOrErrored) {
+            imageView.appendChild(spinner);
+        }
+    }, 500);
+    
+   
     picture.onload = function() {
+        imageLoadedOrErrored = true; 
+        clearTimeout(spinnerTimeout); 
+    
         
-        imageView.removeChild(spinner);
-
-        
+        if (imageView.contains(spinner)) {
+            imageView.removeChild(spinner);
+        }
+    
+       
         pic.appendChild(picture);
         imageView.appendChild(pic);
-    };
+    }
+}
 }
 //--------------- clear selected popup -----------------
 
