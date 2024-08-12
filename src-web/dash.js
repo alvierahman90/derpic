@@ -469,47 +469,30 @@ function selectedPopupFromSlug(liveSlug) {
 
     imageView.textContent = "";
     imageView.style.border = 0;
+
     
-  
     const spinner = document.createElement("div");
     spinner.className = "loading-spinner";
-    
-   
+    imageView.appendChild(spinner);
+
+  
     const pic = document.createElement("div");
     pic.className = "mainPic";
     pic.id = "mainPic";
-    
-   
+
+
     let picture = document.createElement("img");
     picture.id = "imgElement";
     picture.src = liveSlug;
-    
-    
-    let imageLoadedOrErrored = false;
-    
-  
-    const spinnerTimeout = setTimeout(() => {
-        if (!imageLoadedOrErrored) {
-            imageView.appendChild(spinner);
-        }
-    }, 500);
-    
-   
+
     picture.onload = function() {
-        imageLoadedOrErrored = true; 
-        clearTimeout(spinnerTimeout); 
-    
         
-        if (imageView.contains(spinner)) {
-            imageView.removeChild(spinner);
-        }
-    
-       
+        imageView.removeChild(spinner);
+
+        
         pic.appendChild(picture);
         imageView.appendChild(pic);
-    }
-
-
+    };
 }
 //--------------- clear selected popup -----------------
 
