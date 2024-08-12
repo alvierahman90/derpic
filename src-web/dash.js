@@ -401,10 +401,13 @@ function selectedPopup(){
 
         imageView.textContent = "";
         imageView.style.border = 0;
-
+        let spinnerTimeout;
         const spinner = document.createElement("div");
         spinner.className = "loading-spinner";
-        imageView.appendChild(spinner);
+        spinnerTimeout = setTimeout(() => {
+            cell.appendChild(spinner);
+        }, 500);
+        
 
         const pic = document.createElement("div");
         pic.className = "mainPic";
@@ -413,9 +416,9 @@ function selectedPopup(){
         let picture = document.createElement("img");
         picture.id = "imgElement";
         picture.src = `${apiUrl}/${selectedItems[0]}`;
-        
+
         picture.onload = function() {
-       
+            clearTimeout(spinnerTimeout);
             imageView.removeChild(spinner);
     
           
