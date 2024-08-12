@@ -622,8 +622,23 @@ function displayCopyImg(){
         let heightpx = calculateHeight(originHeight,100);
         let flipvBool;
         let fliphBool;
+        let cappedWidth;
+        let cappedHeight;
         let realWidth = calculateWidth(originWidth,100);
-        let realHeight = calculateHeight(originHeight, 100);
+        let realHeight = calculateHeight(originHeight, 100);  // this also needs to be capped at 500px
+        if(realWidth > 500){
+            cappedWidth = 500;
+        }
+        else{
+            cappedWidth = realWidth;
+        }
+
+        if(realHeight > 500){
+            cappedHeight = 500;
+        }
+        else{
+            cappedHeight = realHeight;
+        }
 
         const allowedValues = [0, 90, 180, 270, 360];
         const rotvalue = parseInt(rotation.value, 10);
@@ -672,7 +687,7 @@ function displayCopyImg(){
             flipvBool = "false";
         }
 
-        liveSlug = `${apiUrl}/${slug}?rotation=${rotationdeg}&width=${realWidth}&height=${realWidth}&flipv=${flipvBool}&fliph=${fliphBool}`;
+        liveSlug = `${apiUrl}/${slug}?rotation=${rotationdeg}&width=${cappedWidth}&height=${cappedHeight}&flipv=${flipvBool}&fliph=${fliphBool}`;
         selectedPopupFromSlug(liveSlug);
     }
 }
