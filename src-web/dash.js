@@ -590,7 +590,8 @@ function displayCopyImg(){
             }   
         else{
 
-            selectedPopupFromSlug(`${apiUrl}/${selectedItems[0]}`);
+            // selectedPopupFromSlug(`${apiUrl}/${selectedItems[0]}`);
+            updateImgLive();
             document.getElementById("rt")?.remove();
             document.getElementById("wd")?.remove();
             document.getElementById("hi")?.remove();
