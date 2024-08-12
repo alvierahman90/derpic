@@ -461,24 +461,30 @@ function selectedPopupFromSlug(liveSlug) {
     imageView.style.border = 0;
 
     
+    let spinnerTimeout;
     const spinner = document.createElement("div");
-    
     spinner.className = "loading-spinner";
-    imageView.appendChild(spinner);
+    let hasLoaded = false;
+    spinnerTimeout = setTimeout(() => {
+        if (!hasLoaded) {
+        imageView.appendChild(spinner);
+        }
+    }, 500);
+    
+   
 
-  
     const pic = document.createElement("div");
     pic.className = "mainPic";
     pic.id = "mainPic";
 
-
     let picture = document.createElement("img");
     picture.id = "imgElement";
-    picture.src = liveSlug;
-
+    picture.src = `${apiUrl}/${selectedItems[0]}`;
+    
     picture.onload = function() {
-        
-        imageView.removeChild(spinner);
+        hasLoaded = true;
+        clearTimeout(spinnerTimeout);
+        spinner.remove();
 
         
         pic.appendChild(picture);
