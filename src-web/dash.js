@@ -404,9 +404,11 @@ function selectedPopup(){
         let spinnerTimeout;
         const spinner = document.createElement("div");
         spinner.className = "loading-spinner";
-
+        let hasLoaded = false;
         spinnerTimeout = setTimeout(() => {
+            if (!hasLoaded) {
             imageView.appendChild(spinner);
+            }
         }, 500);
         
        
@@ -420,6 +422,7 @@ function selectedPopup(){
         picture.src = `${apiUrl}/${selectedItems[0]}`;
         
         picture.onload = function() {
+            hasLoaded = true;
             clearTimeout(spinnerTimeout);
             imageView.removeChild(spinner);
     
