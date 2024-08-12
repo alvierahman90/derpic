@@ -629,7 +629,8 @@ function displayCopyImg(){
         if(rotation.value != "" && allowedValues.includes(rotvalue)){
             rotationdeg = rotation.value;
         }
-        else{
+        else if(rotation.value = ""){
+            rotationdeg = 0;
             // alert the user to pick a rotation between 0 and 360 (step of 90)
             // rotation.style = "border: 2px solid #d45500";
             // setTimeout(() => {
@@ -641,18 +642,21 @@ function displayCopyImg(){
          
             
         }
-        else{
+        else if(width.value = ""){
+            widthpx = calculateHeight(originWidth,100);
+        }
             // width.style = "border: 2px solid #d45500";
             // setTimeout(() => {
             //     width.style = "border: 3px solid #282828";
             // }, 1500);
            
-        }
+        
         if(height.value != "" && height.value > 5){
             heightpx = calculateHeight(originHeight,height.value);
            
         }
-        else{
+        else if(height.value = ""){
+            heightpx = calculateHeight(originHeight,100); // make short url by removing this??!?!
             // height.style = "border: 2px solid #d45500";
             // setTimeout(() => {
             //     height.style = "border: 3px solid #282828";
