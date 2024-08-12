@@ -794,6 +794,11 @@ input[type=number]::-webkit-outer-spin-button {
     justify-content: center;
     align-items: center;
   }
+  #img-view{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 
 
   /* Modal styles */
