@@ -791,12 +791,14 @@ function copyURL(){
         const allowedValues = [0, 90, 180, 270, 360];
         const rotvalue = parseInt(rotation.value, 10);
         let copyURL = `${apiUrl}/${slug}`;
+        let letCopy = true;
 
         if(rotation.value != "" && allowedValues.includes(rotvalue)){
             para.push(`rotation=${rotation.value}`);
         }
         else if(rotation.value != "" && !(allowedValues.includes(rotvalue))){
             // alert the user to pick a rotation between 0 and 360 (step of 90)
+            letCopy = false;
             rotation.style = "border: 2px solid darkred";
             setTimeout(() => {
                 rotation.style = "border: 3px solid #282828";
@@ -807,6 +809,7 @@ function copyURL(){
             para.push(`width=${widthpx}`);
         }
         else if(width.value != "" && width.value < 5){
+            letCopy = false;
             width.style = "border: 2px solid darkred";
             setTimeout(() => {
                 width.style = "border: 3px solid #282828";
@@ -819,6 +822,7 @@ function copyURL(){
         }
         
         else if(height.value != "" && height.value < 5){
+            letCopy = false;
             height.style = "border: 2px solid darkred";
             setTimeout(() => {
                 height.style = "border: 3px solid #282828";
@@ -839,14 +843,19 @@ function copyURL(){
         copyURL += `?${para.join('&')}`;
         }
 
+        if(letCopy){
         navigator.clipboard.writeText(copyURL).then(function() {
            copyPopup();
-           copyURL = `${apiUrl}/${slug}`;
-           para = [];
+        //    copyURL = `${apiUrl}/${slug}`;
+        //    para = [];
+        //    letCopy = true;
         }, function(err){
             console.error("Could not copy text: ", err);
         });
-
+        }
+        else{
+            return;
+        }
            
 
     }
