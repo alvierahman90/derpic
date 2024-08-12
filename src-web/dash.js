@@ -424,7 +424,7 @@ function selectedPopup(){
         picture.onload = function() {
             hasLoaded = true;
             clearTimeout(spinnerTimeout);
-            imageView.removeChild(spinner);
+            spinner.remove();
     
           
             pic.appendChild(picture);
