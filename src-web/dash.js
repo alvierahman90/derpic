@@ -421,17 +421,47 @@ function selectedPopup(){
 }
 
 // -------------- selected popup from slug -------------
-function selectedPopupFromSlug(liveSlug){
+// function selectedPopupFromSlug(liveSlug){
+//     imageView.textContent = "";
+//     imageView.style.border = 0;
+//     const pic = document.createElement("div");
+//     pic.className = "mainPic";
+//     pic.id = "mainPic";
+//     let picture = document.createElement("img");
+//     picture.id = "imgElement";
+//     picture.src = liveSlug;
+//     pic.appendChild(picture);
+//     imageView.appendChild(pic);
+// }
+
+function selectedPopupFromSlug(liveSlug) {
+
     imageView.textContent = "";
     imageView.style.border = 0;
+
+    
+    const spinner = document.createElement("div");
+    spinner.className = "loading-spinner";
+    imageView.appendChild(spinner);
+
+  
     const pic = document.createElement("div");
     pic.className = "mainPic";
     pic.id = "mainPic";
+
+
     let picture = document.createElement("img");
     picture.id = "imgElement";
     picture.src = liveSlug;
-    pic.appendChild(picture);
-    imageView.appendChild(pic);
+
+    picture.onload = function() {
+        
+        imageView.removeChild(spinner);
+
+        
+        pic.appendChild(picture);
+        imageView.appendChild(pic);
+    };
 }
 //--------------- clear selected popup -----------------
 
