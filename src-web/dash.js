@@ -401,52 +401,30 @@ function selectedPopup(){
 
         imageView.textContent = "";
         imageView.style.border = 0;
+    
         
-      
         const spinner = document.createElement("div");
         spinner.className = "loading-spinner";
-        
-       
+        imageView.appendChild(spinner);
+    
+      
         const pic = document.createElement("div");
         pic.className = "mainPic";
         pic.id = "mainPic";
-        
-       
+    
+    
         let picture = document.createElement("img");
         picture.id = "imgElement";
-        picture.src = `${apiUrl}/${selectedItems[0]}`;
-        
-        
-        let imageLoadedOrErrored = false;
-        
-      
-        const spinnerTimeout = setTimeout(() => {
-            if (!imageLoadedOrErrored) {
-                imageView.appendChild(spinner);
-            }
-        }, 500);
-        
-       
+        picture.src = `${apiUrl}/${slug}`;
+    
         picture.onload = function() {
-            imageLoadedOrErrored = true; 
-            clearTimeout(spinnerTimeout); 
-        
             
-            if (imageView.contains(spinner)) {
-                imageView.removeChild(spinner);
-            }
-        
-           
+            imageView.removeChild(spinner);
+    
+            
             pic.appendChild(picture);
             imageView.appendChild(pic);
-        }
-    }
-    else if(selectedItems.length > 1){  
-        clearSelectedPopup();
-        clearDisplayCopyImg();
-        console.log("multi");
-        document.getElementById('uploadButton').disabled = true;
-        imageView.innerHTML = "<i class='fa-regular fa-images' style='font-size: 150px'></i><p>Multiple images selected</p>";
+        };
     }
     
 }
@@ -487,9 +465,7 @@ function selectedPopupFromSlug(liveSlug) {
 
     picture.onload = function() {
         
-        if (imageView.contains(spinner)) {
-            imageView.removeChild(spinner);
-        }
+        imageView.removeChild(spinner);
 
         
         pic.appendChild(picture);
