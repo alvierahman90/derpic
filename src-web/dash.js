@@ -622,8 +622,8 @@ function displayCopyImg(){
         let heightpx = calculateHeight(originHeight,100);
         let flipvBool;
         let fliphBool;
-        let realWidth;
-        let realHeight;
+        let realWidth = calculateWidth(originWidth,100);
+        let realHeight = calculateHeight(originHeight, 100);
 
         const allowedValues = [0, 90, 180, 270, 360];
         const rotvalue = parseInt(rotation.value, 10);
@@ -653,7 +653,7 @@ function displayCopyImg(){
             realHeight = 500;
            }
            else{
-            realHeight = heightpx;
+            realHeight = heightpx;  
            }
         }
        
