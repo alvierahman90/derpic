@@ -480,7 +480,7 @@ input[type=number]::-webkit-outer-spin-button {
 }
 
 .copy-area input[type=number]{
-    max-width:90px;
+    min-width:90px;
     height: 30px;
     font-weight: 700;
     border: 3px solid #282828;
