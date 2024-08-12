@@ -401,35 +401,45 @@ function selectedPopup(){
 
         imageView.textContent = "";
         imageView.style.border = 0;
-        let spinnerTimeout;
+        
+        // Create spinner element
         const spinner = document.createElement("div");
         spinner.className = "loading-spinner";
-        let hasLoaded = false;
-        spinnerTimeout = setTimeout(() => {
-            if (!hasLoaded) {
-            imageView.appendChild(spinner);
-            }
-        }, 500);
         
-       
-
+        // Create a div to hold the picture
         const pic = document.createElement("div");
         pic.className = "mainPic";
         pic.id = "mainPic";
-
+        
+        // Create image element
         let picture = document.createElement("img");
         picture.id = "imgElement";
         picture.src = `${apiUrl}/${selectedItems[0]}`;
         
+        // Flag to check if image has loaded or errored
+        let imageLoadedOrErrored = false;
+        
+        // Set a timeout to show the spinner if the image hasn't loaded in 500ms
+        const spinnerTimeout = setTimeout(() => {
+            if (!imageLoadedOrErrored) {
+                imageView.appendChild(spinner);
+            }
+        }, 500);
+        
+        // Handle image load success
         picture.onload = function() {
-            hasLoaded = true;
-            clearTimeout(spinnerTimeout);
-            spinner.remove()
-    
-          
+            imageLoadedOrErrored = true; // Mark that image has loaded successfully
+            clearTimeout(spinnerTimeout); // Clear the spinner timeout
+        
+            // Remove the spinner if it was added
+            if (imageView.contains(spinner)) {
+                imageView.removeChild(spinner);
+            }
+        
+            // Append the image to the container
             pic.appendChild(picture);
             imageView.appendChild(pic);
-        };
+        }
     }
     else if(selectedItems.length > 1){  
         clearSelectedPopup();
@@ -462,14 +472,8 @@ function selectedPopupFromSlug(liveSlug) {
 
     
     const spinner = document.createElement("div");
-    
     spinner.className = "loading-spinner";
-    hasLoaded = false;
-    const spinnerTimeout = setTimeout(() => {
-        if (!hasLoaded) {   
-            imageView.appendChild(spinner);
-        }
-    }, 500);
+    imageView.appendChild(spinner);
 
   
     const pic = document.createElement("div");
@@ -482,9 +486,8 @@ function selectedPopupFromSlug(liveSlug) {
     picture.src = liveSlug;
 
     picture.onload = function() {
-        hasLoaded = true;
-        clearTimeout(spinnerTimeout);
-        spinner.remove();
+        
+        imageView.removeChild(spinner);
 
         
         pic.appendChild(picture);
