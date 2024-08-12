@@ -508,7 +508,8 @@ function selectedPopupFromSlug(liveSlug) {
         pic.appendChild(picture);
         imageView.appendChild(pic);
     }
-}
+
+
 }
 //--------------- clear selected popup -----------------
 
