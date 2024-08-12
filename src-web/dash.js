@@ -424,7 +424,7 @@ function selectedPopup(){
         picture.onload = function() {
             hasLoaded = true;
             clearTimeout(spinnerTimeout);
-            spinner.remove();
+            spinner.remove()
     
           
             pic.appendChild(picture);
@@ -461,26 +461,26 @@ function selectedPopupFromSlug(liveSlug) {
     imageView.style.border = 0;
 
     
-    let spinnerTimeout;
     const spinner = document.createElement("div");
+    
     spinner.className = "loading-spinner";
-    let hasLoaded = false;
-    spinnerTimeout = setTimeout(() => {
-        if (!hasLoaded) {
-        imageView.appendChild(spinner);
+    hasLoaded = false;
+    const spinnerTimeout = setTimeout(() => {
+        if (!hasLoaded) {   
+            imageView.appendChild(spinner);
         }
     }, 500);
-    
-   
 
+  
     const pic = document.createElement("div");
     pic.className = "mainPic";
     pic.id = "mainPic";
 
+
     let picture = document.createElement("img");
     picture.id = "imgElement";
     picture.src = liveSlug;
-    
+
     picture.onload = function() {
         hasLoaded = true;
         clearTimeout(spinnerTimeout);
