@@ -780,24 +780,20 @@ function copyURL(){
         const height = document.getElementById("hi");
         const flipvCB = document.getElementById("fv");
         const fliphCB = document.getElementById("fh");
-        let rotationdeg;
+        // let rotationdeg;
         let widthpx;
         let heightpx;
         let flipvBool;
         let fliphBool;
-
+        let para = [];
         originHeight = extractHeight();
         originWidth = extractWidth();
-
-
         const allowedValues = [0, 90, 180, 270, 360];
         const rotvalue = parseInt(rotation.value, 10);
+        let copyURL = `${apiUrl}/${slug}`;
 
         if(rotation.value != "" && allowedValues.includes(rotvalue)){
-            rotationdeg = rotation.value;
-        }
-        else if(rotation.value = ""){
-            rotationdeg = 0;
+            para.push(`rotation=${rotation.value}`);
         }
         else{
             // alert the user to pick a rotation between 0 and 360 (step of 90)
@@ -808,9 +804,7 @@ function copyURL(){
         }
         if(width.value != "" && width.value > 5){
             widthpx = calculateWidth(originWidth,width.value);
-        }
-        else if(width.value = ""){
-            widthpx = calculateHeight(originWidth,100);
+            para.push(`width=${widthpx}`);
         }
         else{
             width.style = "border: 2px solid darkred";
@@ -821,10 +815,9 @@ function copyURL(){
         }
         if(height.value != "" && height.value > 5){
             heightpx = calculateHeight(originHeight,height.value);
+            para.push(`height=${heightpx}`);
         }
-        else if(height.value = ""){
-            heightpx = calculateHeight(originHeight,100); // make short url by removing this??!?!
-        }
+        
         else{
             height.style = "border: 2px solid darkred";
             setTimeout(() => {
@@ -833,20 +826,17 @@ function copyURL(){
         }
         if(fliphCB.checked){
             fliphBool = "true";
+            para.push(`fliph=${fliphBool}`);
         }
-        else{
-            fliphBool = "false";
-        }
-
+        
         if(flipvCB.checked){
             flipvBool = "true";
-        }
-        else{
-            flipvBool = "false";
+            para.push(`flipv=${flipvBool}`);
         }
 
-        if(widthpx && heightpx && rotationdeg){
-        let copyURL = `${apiUrl}/${slug}?rotation=${rotationdeg}&width=${widthpx}&height=${heightpx}&flipv=${flipvBool}&fliph=${fliphBool}`;
+
+        if(para.length > 0){
+        copyURL += `?${para.join('&')}`;
         
         navigator.clipboard.writeText(copyURL).then(function() {
            copyPopup();
@@ -855,12 +845,12 @@ function copyURL(){
         });
 
         }   
-        else{
+        else {
             return;
         }
     }
     else{
-        let copyURL = `${apiUrl}/${slug}`;
+        copyURL = `${apiUrl}/${slug}`;
         navigator.clipboard.writeText(copyURL).then(function() {
             copyPopup();
         }, function(err){
