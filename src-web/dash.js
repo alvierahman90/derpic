@@ -415,7 +415,7 @@ function selectedPopup(){
     
         let picture = document.createElement("img");
         picture.id = "imgElement";
-        picture.src = `${apiUrl}/${slug}`;
+        picture.src = `${apiUrl}/${selectedItems[0]}`;
     
         picture.onload = function() {
             
@@ -425,6 +425,13 @@ function selectedPopup(){
             pic.appendChild(picture);
             imageView.appendChild(pic);
         };
+    }
+    else if(selectedItems.length > 1){  
+        clearSelectedPopup();
+        clearDisplayCopyImg();
+        console.log("multi");
+        document.getElementById('uploadButton').disabled = true;
+        imageView.innerHTML = "<i class='fa-regular fa-images' style='font-size: 150px'></i><p>Multiple images selected</p>";
     }
     
 }
