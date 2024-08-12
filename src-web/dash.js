@@ -650,10 +650,10 @@ function displayCopyImg(){
         if(width.value != "" && width.value > 5){
             widthpx = calculateWidth(originWidth,width.value);
             if(widthpx > 500){
-                realWidth = 500;
+                cappedWidth = 500;
             }
             else{
-                realWidth = widthpx;
+                cappedWidth = widthpx;
             }
             
         }
@@ -665,10 +665,10 @@ function displayCopyImg(){
             heightpx = calculateHeight(originHeight,height.value);
             console.log(heightpx);  
            if(heightpx > 500){
-            realHeight = 500;
+            cappedHeight = 500;
            }
            else{
-            realHeight = heightpx;  
+            cappedHeight = heightpx;  
            }
         }
        
