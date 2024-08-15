@@ -408,25 +408,21 @@ function selectedPopup(){
         pic.className = "mainPic";
         pic.id = "mainPic";
 
-        const spinner = document.createElement('div');
-        spinner.className = 'loading-spinner';
-        imageView.appendChild(spinner);
+        // const spinner = document.createElement('div');
+        // spinner.className = 'loading-spinner';
+        // imageView.appendChild(spinner);
 
-        const existingMainPic = document.getElementById("mainPic");
-        if (existingMainPic) {
-            imageView.removeChild(existingMainPic);
-        }
 
         let picture = document.createElement("img");
         picture.id = "imgElement";
         picture.src = `${apiUrl}/${selectedItems[0]}`;
         
           
-        picture.onload = function(){
-        spinner.remove();
+        // picture.onload = function(){
+        // spinner.remove();
         pic.appendChild(picture);
         imageView.appendChild(pic);
-    };
+    // };
   
         
     }
@@ -465,25 +461,20 @@ function selectedPopupFromSlug(liveSlug) {
     livepic.className = "mainPic";
     livepic.id = "mainPic";
 
-    const spinner = document.createElement('div');
-    spinner.className = 'loading-spinner';
-    imageView.appendChild(spinner);
-
-    const existingMainPic = document.getElementById("mainPic");
-    if (existingMainPic) {
-        imageView.removeChild(existingMainPic);
-    }
+    // const spinner = document.createElement('div');
+    // spinner.className = 'loading-spinner';
+    // imageView.appendChild(spinner);
 
     let livepicture = document.createElement("img");
 
     livepicture.id = "imgElement";
     livepicture.src = liveSlug;
 
-    livepicture.onload = function(){
-        spinner.remove();
+    // livepicture.onload = function(){
+        // spinner.remove();
         livepic.appendChild(livepicture);
         imageView.appendChild(livepic);
-    };
+    // };
   
  
 }
