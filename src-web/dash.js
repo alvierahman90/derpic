@@ -903,9 +903,9 @@ function copyURL(){
         if(letCopy){
         navigator.clipboard.writeText(copyURL).then(function() {
            copyPopup();
-        //    copyURL = `${apiUrl}/${slug}`;
-        //    para = [];
-        //    letCopy = true;
+           copyURL = `${apiUrl}/${slug}`;
+           para = [];
+           letCopy = true;
         }, function(err){
             console.error("Could not copy text: ", err);
         });
