@@ -408,13 +408,21 @@ function selectedPopup(){
         pic.className = "mainPic";
         pic.id = "mainPic";
 
+        const spinner = document.createElement('div');
+        spinner.className = 'loading-spinner';
+        imageView.appendChild(spinner);
+
         let picture = document.createElement("img");
         picture.id = "imgElement";
         picture.src = `${apiUrl}/${selectedItems[0]}`;
         
           
+        img.onload = function(){
+        spinner.remove();
         pic.appendChild(picture);
         imageView.appendChild(pic);
+    };
+  
         
     }
     else if(selectedItems.length > 1){  
@@ -446,19 +454,27 @@ function selectedPopupFromSlug(liveSlug) {
     imageView.textContent = "";
     imageView.style.border = 0;
     
+
   
     const pic = document.createElement("div");
     pic.className = "mainPic";
     pic.id = "mainPic";
 
+    const spinner = document.createElement('div');
+    spinner.className = 'loading-spinner';
+    imageView.appendChild(spinner);
 
     let picture = document.createElement("img");
+
     picture.id = "imgElement";
     picture.src = liveSlug;
 
-   
-    pic.appendChild(picture);
-    imageView.appendChild(pic);
+    img.onload = function(){
+        spinner.remove();
+        pic.appendChild(picture);
+        imageView.appendChild(pic);
+    };
+  
  
 }
 //--------------- clear selected popup -----------------
