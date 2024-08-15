@@ -412,6 +412,11 @@ function selectedPopup(){
         spinner.className = 'loading-spinner';
         imageView.appendChild(spinner);
 
+        const existingMainPic = document.getElementById("mainPic");
+        if (existingMainPic) {
+            imageView.removeChild(existingMainPic);
+        }
+
         let picture = document.createElement("img");
         picture.id = "imgElement";
         picture.src = `${apiUrl}/${selectedItems[0]}`;
@@ -463,6 +468,11 @@ function selectedPopupFromSlug(liveSlug) {
     const spinner = document.createElement('div');
     spinner.className = 'loading-spinner';
     imageView.appendChild(spinner);
+
+    const existingMainPic = document.getElementById("mainPic");
+    if (existingMainPic) {
+        imageView.removeChild(existingMainPic);
+    }
 
     let livepicture = document.createElement("img");
 
