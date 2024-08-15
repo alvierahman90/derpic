@@ -417,7 +417,7 @@ function selectedPopup(){
         picture.src = `${apiUrl}/${selectedItems[0]}`;
         
           
-        pic.onload = function(){
+        picture.onload = function(){
         spinner.remove();
         pic.appendChild(picture);
         imageView.appendChild(pic);
@@ -469,7 +469,7 @@ function selectedPopupFromSlug(liveSlug) {
     picture.id = "imgElement";
     picture.src = liveSlug;
 
-    pic.onload = function(){
+    picture.onload = function(){
         spinner.remove();
         pic.appendChild(picture);
         imageView.appendChild(pic);
