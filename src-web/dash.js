@@ -416,7 +416,7 @@ function selectedPopup(){
         
         picture.onload = function() {
        
-            imageView.removeChild(spinner);
+            spinner.remove();
     
           
             pic.appendChild(picture);
@@ -468,7 +468,7 @@ function selectedPopupFromSlug(liveSlug) {
 
     picture.onload = function() {
         
-        imageView.removeChild(spinner);
+        spinner.remove();
 
         
         pic.appendChild(picture);
