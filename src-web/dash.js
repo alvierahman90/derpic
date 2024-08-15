@@ -456,23 +456,23 @@ function selectedPopupFromSlug(liveSlug) {
     
 
   
-    const pic = document.createElement("div");
-    pic.className = "mainPic";
-    pic.id = "mainPic";
+    const livepic = document.createElement("div");
+    livepic.className = "mainPic";
+    livepic.id = "mainPic";
 
     const spinner = document.createElement('div');
     spinner.className = 'loading-spinner';
     imageView.appendChild(spinner);
 
-    let picture = document.createElement("img");
+    let livepicture = document.createElement("img");
 
-    picture.id = "imgElement";
-    picture.src = liveSlug;
+    livepicture.id = "imgElement";
+    livepicture.src = liveSlug;
 
-    picture.onload = function(){
+    livepicture.onload = function(){
         spinner.remove();
-        pic.appendChild(picture);
-        imageView.appendChild(pic);
+        livepic.appendChild(livepicture);
+        imageView.appendChild(livepic);
     };
   
  
