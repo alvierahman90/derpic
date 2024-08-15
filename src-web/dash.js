@@ -847,7 +847,7 @@ function copyURL(){
         originWidth = extractWidth();
         const allowedValues = [0, 90, 180, 270, 360];
         const rotvalue = parseInt(rotation.value, 10);
-        let copyURL = `${apiUrl}/${slug}`;
+        let UrlToCopy = `${apiUrl}/${slug}`;
         let letCopy = true;
 
         if(rotation.value != "" && allowedValues.includes(rotvalue)){
@@ -897,13 +897,13 @@ function copyURL(){
 
 
         if(para.length > 0){
-        copyURL += `?${para.join('&')}`;
+        UrlToCopy += `?${para.join('&')}`;
         }
 
         if(letCopy){
-        navigator.clipboard.writeText(copyURL).then(function() {
+        navigator.clipboard.writeText(UrlToCopy).then(function() {
            copyPopup();
-           copyURL = `${apiUrl}/${slug}`;
+           UrlToCopy = `${apiUrl}/${slug}`;
            para = [];
            letCopy = true;
         }, function(err){
@@ -913,8 +913,8 @@ function copyURL(){
 
     }
     else{
-        copyURL = `${apiUrl}/${slug}`;
-        navigator.clipboard.writeText(copyURL).then(function() {
+        UrlToCopy = `${apiUrl}/${slug}`;
+        navigator.clipboard.writeText(UrlToCopy).then(function() {
             copyPopup();
         }, function(err){
             console.error("Could not copy text: ", err);
