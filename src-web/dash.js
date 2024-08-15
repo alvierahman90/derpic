@@ -924,10 +924,6 @@ function copyURL(){
             console.error("Could not copy text: ", err);
         });
         }
-        else{
-            return;
-        }
-           
 
     }
     else{
