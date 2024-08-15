@@ -402,9 +402,7 @@ function selectedPopup(){
         imageView.textContent = "";
         imageView.style.border = 0;
 
-        const spinner = document.createElement("div");
-        spinner.className = "loading-spinner";
-        imageView.appendChild(spinner);
+
 
         const pic = document.createElement("div");
         pic.className = "mainPic";
@@ -414,14 +412,10 @@ function selectedPopup(){
         picture.id = "imgElement";
         picture.src = `${apiUrl}/${selectedItems[0]}`;
         
-        picture.onload = function() {
-       
-            spinner.remove();
-    
           
-            pic.appendChild(picture);
-            imageView.appendChild(pic);
-        };
+        pic.appendChild(picture);
+        imageView.appendChild(pic);
+        
     }
     else if(selectedItems.length > 1){  
         clearSelectedPopup();
@@ -452,10 +446,6 @@ function selectedPopupFromSlug(liveSlug) {
     imageView.textContent = "";
     imageView.style.border = 0;
     
-    const spinner = document.createElement("div");
-    spinner.className = "loading-spinner";
-    imageView.appendChild(spinner);
-
   
     const pic = document.createElement("div");
     pic.className = "mainPic";
@@ -466,14 +456,10 @@ function selectedPopupFromSlug(liveSlug) {
     picture.id = "imgElement";
     picture.src = liveSlug;
 
-    picture.onload = function() {
-        
-        spinner.remove();
-
-        
-        pic.appendChild(picture);
-        imageView.appendChild(pic);
-    };
+   
+    pic.appendChild(picture);
+    imageView.appendChild(pic);
+ 
 }
 //--------------- clear selected popup -----------------
 
