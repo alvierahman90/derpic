@@ -402,29 +402,26 @@ function selectedPopup(){
         imageView.textContent = "";
         imageView.style.border = 0;
 
-
+        const spinner = document.createElement("div");
+        spinner.className = "loading-spinner";
+        imageView.appendChild(spinner);
 
         const pic = document.createElement("div");
         pic.className = "mainPic";
         pic.id = "mainPic";
 
-        // const spinner = document.createElement('div');
-        // spinner.className = 'loading-spinner';
-        // imageView.appendChild(spinner);
-
-
         let picture = document.createElement("img");
         picture.id = "imgElement";
         picture.src = `${apiUrl}/${selectedItems[0]}`;
         
+        picture.onload = function() {
+       
+            imageView.removeChild(spinner);
+    
           
-        // picture.onload = function(){
-        // spinner.remove();
-        pic.appendChild(picture);
-        imageView.appendChild(pic);
-    // };
-  
-        
+            pic.appendChild(picture);
+            imageView.appendChild(pic);
+        };
     }
     else if(selectedItems.length > 1){  
         clearSelectedPopup();
@@ -455,28 +452,28 @@ function selectedPopupFromSlug(liveSlug) {
     imageView.textContent = "";
     imageView.style.border = 0;
     
+    const spinner = document.createElement("div");
+    spinner.className = "loading-spinner";
+    imageView.appendChild(spinner);
 
   
-    const livepic = document.createElement("div");
-    livepic.className = "mainPic";
-    livepic.id = "mainPic";
+    const pic = document.createElement("div");
+    pic.className = "mainPic";
+    pic.id = "mainPic";
 
-    // const spinner = document.createElement('div');
-    // spinner.className = 'loading-spinner';
-    // imageView.appendChild(spinner);
 
-    let livepicture = document.createElement("img");
+    let picture = document.createElement("img");
+    picture.id = "imgElement";
+    picture.src = liveSlug;
 
-    livepicture.id = "imgElement";
-    livepicture.src = liveSlug;
+    picture.onload = function() {
+        
+        imageView.removeChild(spinner);
 
-    // livepicture.onload = function(){
-        // spinner.remove();
-        livepic.appendChild(livepicture);
-        imageView.appendChild(livepic);
-    // };
-  
- 
+        
+        pic.appendChild(picture);
+        imageView.appendChild(pic);
+    };
 }
 //--------------- clear selected popup -----------------
 
@@ -864,7 +861,7 @@ function copyURL(){
         originWidth = extractWidth();
         const allowedValues = [0, 90, 180, 270, 360];
         const rotvalue = parseInt(rotation.value, 10);
-        let UrlToCopy = `${apiUrl}/${slug}`;
+        let copyURL = `${apiUrl}/${slug}`;
         let letCopy = true;
 
         if(rotation.value != "" && allowedValues.includes(rotvalue)){
@@ -914,24 +911,28 @@ function copyURL(){
 
 
         if(para.length > 0){
-        UrlToCopy += `?${para.join('&')}`;
+        copyURL += `?${para.join('&')}`;
         }
 
         if(letCopy){
-        navigator.clipboard.writeText(UrlToCopy).then(function() {
+        navigator.clipboard.writeText(copyURL).then(function() {
            copyPopup();
-           UrlToCopy = `${apiUrl}/${slug}`;
-           para = [];
-           letCopy = true;
+        //    copyURL = `${apiUrl}/${slug}`;
+        //    para = [];
+        //    letCopy = true;
         }, function(err){
             console.error("Could not copy text: ", err);
         });
         }
+        else{
+            return;
+        }
+           
 
     }
     else{
-        UrlToCopy = `${apiUrl}/${slug}`;
-        navigator.clipboard.writeText(UrlToCopy).then(function() {
+        copyURL = `${apiUrl}/${slug}`;
+        navigator.clipboard.writeText(copyURL).then(function() {
             copyPopup();
         }, function(err){
             console.error("Could not copy text: ", err);
