@@ -402,9 +402,9 @@ function selectedPopup(){
         imageView.textContent = "";
         imageView.style.border = 0;
 
-        const spinner = document.createElement("div");
-        spinner.className = "loading-spinner";
-        imageView.appendChild(spinner);
+        // const spinner = document.createElement("div");
+        // spinner.className = "loading-spinner";
+        // imageView.appendChild(spinner);
 
         const pic = document.createElement("div");
         pic.className = "mainPic";
@@ -414,14 +414,14 @@ function selectedPopup(){
         picture.id = "imgElement";
         picture.src = `${apiUrl}/${selectedItems[0]}`;
         
-        picture.onload = function() {
+        // picture.onload = function() {
        
-            imageView.removeChild(spinner);
+        //     imageView.removeChild(spinner);
     
           
             pic.appendChild(picture);
             imageView.appendChild(pic);
-        };
+        // };
     }
     else if(selectedItems.length > 1){  
         clearSelectedPopup();
@@ -452,9 +452,9 @@ function selectedPopupFromSlug(liveSlug) {
     imageView.textContent = "";
     imageView.style.border = 0;
     
-    const spinner = document.createElement("div");
-    spinner.className = "loading-spinner";
-    imageView.appendChild(spinner);
+    // const spinner = document.createElement("div");
+    // spinner.className = "loading-spinner";
+    // imageView.appendChild(spinner);
 
   
     const pic = document.createElement("div");
@@ -466,14 +466,14 @@ function selectedPopupFromSlug(liveSlug) {
     picture.id = "imgElement";
     picture.src = liveSlug;
 
-    picture.onload = function() {
+    // picture.onload = function() {
         
-        imageView.removeChild(spinner);
+    //     imageView.removeChild(spinner);
 
         
         pic.appendChild(picture);
         imageView.appendChild(pic);
-    };
+    // };
 }
 //--------------- clear selected popup -----------------
 
@@ -861,7 +861,7 @@ function copyURL(){
         originWidth = extractWidth();
         const allowedValues = [0, 90, 180, 270, 360];
         const rotvalue = parseInt(rotation.value, 10);
-        let copyURL = `${apiUrl}/${slug}`;
+        let UrlToCopy = `${apiUrl}/${slug}`;
         let letCopy = true;
 
         if(rotation.value != "" && allowedValues.includes(rotvalue)){
@@ -911,15 +911,15 @@ function copyURL(){
 
 
         if(para.length > 0){
-        copyURL += `?${para.join('&')}`;
+        UrlToCopy += `?${para.join('&')}`;
         }
 
         if(letCopy){
-        navigator.clipboard.writeText(copyURL).then(function() {
+        navigator.clipboard.writeText(UrlToCopy).then(function() {
            copyPopup();
-        //    copyURL = `${apiUrl}/${slug}`;
-        //    para = [];
-        //    letCopy = true;
+           UrlToCopy = `${apiUrl}/${slug}`;
+           para = [];
+           letCopy = true;
         }, function(err){
             console.error("Could not copy text: ", err);
         });
@@ -931,8 +931,8 @@ function copyURL(){
 
     }
     else{
-        copyURL = `${apiUrl}/${slug}`;
-        navigator.clipboard.writeText(copyURL).then(function() {
+        UrlToCopy = `${apiUrl}/${slug}`;
+        navigator.clipboard.writeText(UrlToCopy).then(function() {
             copyPopup();
         }, function(err){
             console.error("Could not copy text: ", err);
