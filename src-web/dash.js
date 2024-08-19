@@ -402,9 +402,9 @@ function selectedPopup(){
         imageView.textContent = "";
         imageView.style.border = 0;
 
-        // const spinner = document.createElement("div");
-        // spinner.className = "loading-spinner";
-        // imageView.appendChild(spinner);
+        const spinner = document.createElement("div");
+        spinner.className = "loading-spinner";
+        imageView.appendChild(spinner);
 
         const pic = document.createElement("div");
         pic.className = "mainPic";
@@ -414,14 +414,12 @@ function selectedPopup(){
         picture.id = "imgElement";
         picture.src = `${apiUrl}/${selectedItems[0]}`;
 
-        // picture.onload = function() {
-       
-        //     imageView.removeChild(spinner);
-    
-          
-            pic.appendChild(picture);
-            imageView.appendChild(pic);
-        // };
+        // Ensure the image is appended only after it has loaded
+        picture.onload = function() {
+            imageView.removeChild(spinner);  // Remove the spinner
+            pic.appendChild(picture);        // Append the image to the container
+            imageView.appendChild(pic);      // Append the container to the view
+        };
     }
     else if(selectedItems.length > 1){  
         clearSelectedPopup();
