@@ -449,29 +449,26 @@ function selectedPopupFromSlug(liveSlug) {
 
     imageView.textContent = "";
     imageView.style.border = 0;
-
-    // const spinner = document.createElement("div");
-    // spinner.className = "loading-spinner";
-    // imageView.appendChild(spinner);
-
-  
+    
+    // Create the spinner element
+    const spinner = document.createElement("div");
+    spinner.className = "loading-spinner";
+    imageView.appendChild(spinner);
+    
     const pic = document.createElement("div");
     pic.className = "mainPic";
     pic.id = "mainPic";
-
-
+    
     let picture = document.createElement("img");
     picture.id = "imgElement";
     picture.src = liveSlug;
-
-    // picture.onload = function() {
-        
-    //     imageView.removeChild(spinner);
-
-        
-        pic.appendChild(picture);
-        imageView.appendChild(pic);
-    // };
+    
+    // Ensure the image is appended only after it has fully loaded
+    picture.onload = function() {
+        imageView.removeChild(spinner);  // Remove the spinner
+        pic.appendChild(picture);        // Append the image to the container
+        imageView.appendChild(pic);      // Append the container to the view
+    };
 }
 //--------------- clear selected popup -----------------
 
