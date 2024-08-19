@@ -413,7 +413,7 @@ function selectedPopup(){
         let picture = document.createElement("img");
         picture.id = "imgElement";
         picture.src = `${apiUrl}/${selectedItems[0]}`;
-        
+
         // picture.onload = function() {
        
         //     imageView.removeChild(spinner);
@@ -451,7 +451,7 @@ function selectedPopupFromSlug(liveSlug) {
 
     imageView.textContent = "";
     imageView.style.border = 0;
-    
+
     // const spinner = document.createElement("div");
     // spinner.className = "loading-spinner";
     // imageView.appendChild(spinner);
@@ -861,6 +861,7 @@ function copyURL(){
         originWidth = extractWidth();
         const allowedValues = [0, 90, 180, 270, 360];
         const rotvalue = parseInt(rotation.value, 10);
+
         let UrlToCopy = `${apiUrl}/${slug}`;
         let letCopy = true;
 
