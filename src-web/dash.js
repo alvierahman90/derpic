@@ -250,7 +250,7 @@ async function getImageFile() {
             const filename = urlParts[urlParts.length - 1];
 
             const file = new File([blob], filename, { type: blob.type });
-
+            console.log(file);
             // Create a temporary image element to get the dimensions
             const tempImg = new Image();
             tempImg.src = imgUrl;
