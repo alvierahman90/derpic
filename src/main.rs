@@ -347,9 +347,11 @@ impl Api {
     #[oai(path = "/i", method = "post")]
     async fn post_image(
         &self,
+        raw: Query<Option<bool>>,
         #[oai(name = "X-Derpic-Token")] token: Header<String>,
         data: Binary<Vec<u8>>,
     ) -> Result<ImageUploadResult> {
+        let raw = raw.unwrap_or(false);
         let conn = &mut derpic::db::establish_connection();
         let token = match token_decode(token.0) {
             Err(_) => return Ok(ImageUploadResult::NotAuthorized),
@@ -365,11 +367,27 @@ impl Api {
             Ok(Some(token)) => token,
         };
 
+        let image = if raw {
+            data.0
+        } else {
+            let mut buf = std::io::Cursor::new(vec![]);
+            let cursor = std::io::Cursor::new(data.0);
+            let dynamic_image = image::io::Reader::new(cursor)
+                .with_guessed_format()
+                .map_err(InternalServerError)?
+                .decode()
+                .map_err(InternalServerError)?;
+            dynamic_image
+                .write_to(&mut buf, image::ImageFormat::Png)
+                .unwrap();
+            buf.into_inner()
+        };
+
         match DbImage::new(
             conn,
             NewDbImage {
                 token_id: token.id(),
-                image: data.0,
+                image,
             },
         ) {
             Err(e) => {
