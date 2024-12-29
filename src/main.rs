@@ -210,6 +210,8 @@ impl Api {
         #[oai(name = "fliph")]
         /// Flip image horizontally.
         fliph: Query<Option<bool>>,
+        /// If set, all other options are ignored and raw file as stored is sent.
+        raw: Query<Option<bool>>,
     ) -> Result<ImageResponse> {
         let mut slug_split = slug.split('.');
         let Some(slug) = slug_split.next() else {
@@ -230,6 +232,23 @@ impl Api {
             Ok(None) => return Err(NotFoundError.into()),
             Ok(Some(i)) => i,
         };
+
+        let raw = match raw.0 {
+            Some(raw) => raw,
+            None => match requested_extension {
+                image::ImageFormat::Gif => {
+                    rotation.is_none()
+                        && width.is_none()
+                        && height.is_none()
+                        && fliph.is_none()
+                        && flipv.is_none()
+                }
+                _ => false,
+            },
+        };
+        if raw {
+            return Ok(ImageResponse::Xyz(Binary(db_image.as_raw_image())));
+        }
 
         let mut image = match db_image.as_image() {
             Err(e) => {

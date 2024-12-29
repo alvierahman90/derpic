@@ -58,6 +58,10 @@ impl DbImage {
             .decode()
     }
 
+    pub fn as_raw_image(self) -> Vec<u8> {
+        self.image
+    }
+
     pub fn new(conn: &mut PgConnection, new: NewDbImage) -> Result<Self, DieselError> {
         diesel::insert_into(table::table)
             .values::<NewDbImageWithSlug>(new.into())
