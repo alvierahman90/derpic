@@ -19,7 +19,17 @@ struct Api;
 #[derive(ApiResponse)]
 enum ImageResponse {
     #[oai(status = 200, content_type = "image/png")]
-    Image(Binary<Vec<u8>>),
+    Png(Binary<Vec<u8>>),
+    #[oai(status = 200, content_type = "image/jpeg")]
+    Jpeg(Binary<Vec<u8>>),
+    #[oai(status = 200, content_type = "image/webp")]
+    WebP(Binary<Vec<u8>>),
+    #[oai(status = 200, content_type = "image/gif")]
+    Gif(Binary<Vec<u8>>),
+    #[oai(status = 200, content_type = "image/xyz")]
+    Xyz(Binary<Vec<u8>>),
+    #[oai(status = 400)]
+    BadRequest,
 }
 
 #[derive(ApiResponse)]
@@ -183,7 +193,7 @@ impl Api {
     async fn get_image(
         &self,
         #[oai(name = "slug")]
-        /// Name of image to get.
+        /// Name of image to get, with file extension.
         slug: Path<String>,
         #[oai(name = "rotation")]
         /// Angle to rotate image by. Valid values are 90, 180, 270, -90, -180, -270.
@@ -200,10 +210,21 @@ impl Api {
         #[oai(name = "fliph")]
         /// Flip image horizontally.
         fliph: Query<Option<bool>>,
+        /// If set, all other options are ignored and raw file as stored is sent.
+        raw: Query<Option<bool>>,
     ) -> Result<ImageResponse> {
-        log::debug!("height={:?}", height.0);
+        let mut slug_split = slug.split('.');
+        let Some(slug) = slug_split.next() else {
+            return Ok(ImageResponse::BadRequest);
+        };
+        let Some(requested_extension) =
+            image::ImageFormat::from_extension(slug_split.next().unwrap_or("png"))
+        else {
+            return Ok(ImageResponse::BadRequest);
+        };
+
         let conn = &mut derpic::db::establish_connection();
-        let db_image = match DbImage::get_by_slug(conn, slug.0) {
+        let db_image = match DbImage::get_by_slug(conn, slug.to_string()) {
             Err(e) => {
                 log::error!("{e}");
                 return Err(InternalServerError(Box::new(e)));
@@ -211,6 +232,23 @@ impl Api {
             Ok(None) => return Err(NotFoundError.into()),
             Ok(Some(i)) => i,
         };
+
+        let raw = match raw.0 {
+            Some(raw) => raw,
+            None => match requested_extension {
+                image::ImageFormat::Gif => {
+                    rotation.is_none()
+                        && width.is_none()
+                        && height.is_none()
+                        && fliph.is_none()
+                        && flipv.is_none()
+                }
+                _ => false,
+            },
+        };
+        if raw {
+            return Ok(ImageResponse::Xyz(Binary(db_image.as_raw_image())));
+        }
 
         let mut image = match db_image.as_image() {
             Err(e) => {
@@ -256,17 +294,21 @@ impl Api {
         }
 
         let mut response = Vec::new();
-        image
-            .write_to(
-                &mut std::io::Cursor::new(&mut response),
-                image::ImageFormat::Png,
-                //image::ImageFormat::from_extension(format.0).ok_or(poem::Error::from_status(
-                //poem::http::StatusCode::BAD_REQUEST,
-                //))?,
-            )
-            .map_err(InternalServerError)?;
+        if let Err(e) = image.write_to(
+            &mut std::io::Cursor::new(&mut response),
+            requested_extension,
+        ) {
+            log::debug!("{}", e);
+            return Err(InternalServerError(e));
+        };
 
-        Ok(ImageResponse::Image(Binary(response)))
+        match requested_extension {
+            image::ImageFormat::Png => Ok(ImageResponse::Png(Binary(response))),
+            image::ImageFormat::Jpeg => Ok(ImageResponse::Jpeg(Binary(response))),
+            image::ImageFormat::WebP => Ok(ImageResponse::WebP(Binary(response))),
+            image::ImageFormat::Gif => Ok(ImageResponse::Gif(Binary(response))),
+            _ => Ok(ImageResponse::Xyz(Binary(response))),
+        }
     }
 
     #[oai(path = "/i", method = "get")]
@@ -324,9 +366,11 @@ impl Api {
     #[oai(path = "/i", method = "post")]
     async fn post_image(
         &self,
+        raw: Query<Option<bool>>,
         #[oai(name = "X-Derpic-Token")] token: Header<String>,
         data: Binary<Vec<u8>>,
     ) -> Result<ImageUploadResult> {
+        let raw = raw.unwrap_or(false);
         let conn = &mut derpic::db::establish_connection();
         let token = match token_decode(token.0) {
             Err(_) => return Ok(ImageUploadResult::NotAuthorized),
@@ -342,11 +386,27 @@ impl Api {
             Ok(Some(token)) => token,
         };
 
+        let image = if raw {
+            data.0
+        } else {
+            let mut buf = std::io::Cursor::new(vec![]);
+            let cursor = std::io::Cursor::new(data.0);
+            let dynamic_image = image::io::Reader::new(cursor)
+                .with_guessed_format()
+                .map_err(InternalServerError)?
+                .decode()
+                .map_err(InternalServerError)?;
+            dynamic_image
+                .write_to(&mut buf, image::ImageFormat::Png)
+                .unwrap();
+            buf.into_inner()
+        };
+
         match DbImage::new(
             conn,
             NewDbImage {
                 token_id: token.id(),
-                image: data.0,
+                image,
             },
         ) {
             Err(e) => {
