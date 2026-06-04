@@ -555,16 +555,22 @@ input[type=number]::-webkit-outer-spin-button {
     transform: translateY(-50%);
     height: 30px; 
     min-width:90px;  
-    /* border-radius: 5px; */
+    /* square corners */
     background-color: #585858;
    
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 16px; 
+    font-size: clamp(8px, 1.4vw, 12px); 
+    line-height: 30px; 
     font-weight:700; 
     color: #fff;
     text-align: center;
+    white-space: nowrap;           
+    overflow: hidden;               
+    text-overflow: ellipsis;     
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 
@@ -576,36 +582,29 @@ input[type=number]::-webkit-outer-spin-button {
 
 
 .flipvSpan::before {
-    
     content: "flip-v on"; 
     font-family: "Open Sans", sans-serif;
     position: absolute;
     left: 0;
     top: 50%;
     transform: translateY(-50%);
-    /* border-radius: 5px; */
+    /* square corners */
     min-width:90px; 
     height: 31px; 
     font-weight: 700;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 16px; 
+    font-size: clamp(8px, 1.4vw, 12px);
+    line-height: 30px;
     color: transparent;
     transition: color 0.2s;
     box-shadow: 3px 3px 0 0 rgba(0,0,0,0.2);
-}
-
-
-.flipvLabel input[type="checkbox"]:checked + .flipvSpan::before {
-    color: white;
-
-}
-
-
-.flipvSpan {
- 
-    vertical-align: middle;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 /* ------------------------------fliph----------- */
@@ -631,16 +630,22 @@ input[type=number]::-webkit-outer-spin-button {
     transform: translateY(-50%);
     height: 30px; 
     min-width:90px; 
-  /* border-radius: 5px; */
+  /* square corners */
     background-color: #585858;
     /* border: 1px solid #ccc; */
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 16px; 
+    font-size: clamp(8px, 1.4vw, 12px); /* smaller clamp */
+    line-height: 30px;
     font-weight: 700;
     color: #fff;
     text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 
@@ -657,17 +662,23 @@ input[type=number]::-webkit-outer-spin-button {
     left: 0;
     top: 50%;
     transform: translateY(-50%);
-    /* border-radius: 5px; */
+    /* square corners */
     min-width:90px;
     height: 31px; 
     font-weight: 700;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 16px; 
+    font-size: clamp(8px, 1.4vw, 12px);
+    line-height: 30px;
     color: transparent;
     transition: color 0.2s;
      box-shadow: 3px 3px 0 0 rgba(0,0,0,0.2);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 
@@ -687,97 +698,84 @@ input[type=number]::-webkit-outer-spin-button {
     display: none;
 }
 .customLabel {
-    min-width:90px;
-    height: 30px;
     display: inline-block;
     position: relative;
-    padding-left: 80px; 
+    width: 90px; /* match other buttons */
+    height: 48px; /* space for top label + 30px track */
     cursor: pointer;
-    font-size: 16px;
     user-select: none;
+    vertical-align: middle;
 }
 
-.customLabel::before {
+/* Top label that changes between Default and Custom via the checked state
+   Implemented as .customSpan::before but made visible above the track */
+.customLabel .customSpan::before {
     content: "Default";
     position: absolute;
+    top: -18px; /* place above the toggle */
     left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    height: 30px; 
-    min-width:90px; 
-    /* border-radius: 5px; */
-    background-color: #585858;
-    /* border: 1px solid #ccc; */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px; 
-    font-weight: 700;
-    color: #fff;
+    width: 100%;
     text-align: center;
+    font-size: 16px;
+    font-weight: 700;
+    color: #ffffff; /* white text so it stands out */
+    z-index: 6;
+    pointer-events: none;
 }
 
-
-.customLabel input[type="checkbox"]:checked + .customSpan::before {
-    background-color: #282828;
-    border-color: #282828;
-    color: white;
-}
-
-
-.customSpan::before {
-    content: "Custom"; 
+/* The visible track (no border radius) */
+.customLabel .customSpan {
+    display: block;
+    width: 100%;
+    height: 30px; /* track height to match other buttons */
+    background-color: #585858;
+    border-radius: 0;
     position: absolute;
     left: 0;
+    bottom: 0;
+    transition: background-color 0.18s ease;
+    box-shadow: 3px 3px 0 0 rgba(0,0,0,0.12);
+    overflow: visible; /* allow the top label to show */
+    color: #fff;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 10px;
+}
+
+/* Knob (square) */
+.customLabel .customSpan::after {
+    content: "";
+    position: absolute;
+    width: 26px;
+    height: 26px;
+    left: 2px;
     top: 50%;
     transform: translateY(-50%);
-    /* border-radius: 5px; */
-    min-width:90px;
-    height: 30px; 
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px; 
-    color: transparent;
-    transition: color 0.2s;
-     box-shadow: 3px 3px 0 0 rgba(0,0,0,0.2);
+    background: #ffffff;
+    border-radius: 0;
+    transition: left 0.18s ease, background-color 0.18s ease;
+    box-shadow: 0 2px 0 rgba(0,0,0,0.15);
+    z-index: 3;
 }
 
-
+/* When checked: change track color, move knob and update top label text */
+.customLabel input[type="checkbox"]:checked + .customSpan {
+    background-color: #282828;
+}
+.customLabel input[type="checkbox"]:checked + .customSpan::after {
+    left: calc(100% - 28px);
+}
 .customLabel input[type="checkbox"]:checked + .customSpan::before {
-    color: white;
+    content: "Custom";
+    color: #ffffff; /* ensure white when checked */
 }
 
-
+/* keep small padding for alignment when used inline */
 .customSpan {
-    padding-left: 10px;
+    padding-left: 0;
     vertical-align: middle;
 }
 /* -------------------------- */
-/* .wd{
-    padding-right: 20px;
-}
-.hi{
-    padding-right: 20px;
-}
-.wd::after{
-    content: "%";
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    pointer-events: none; 
-}
-
-.hi::after{
-    content: "%";
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    pointer-events: none; 
-/* ----------------- */
 
 
 .copyPopup{
