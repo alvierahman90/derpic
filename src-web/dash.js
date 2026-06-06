@@ -123,7 +123,7 @@ function uploadImageAPI(){
                 document.getElementById('input-img').value = '';
                 resetDropArea();
                 const metadataElement = document.getElementById('metadata');
-                metadataElement.innerHTML = "File Name:<br>File Size:<br>File Type:<br>Image Width:<br>Image Height:";
+                metadataElement.innerHTML = "file name:<br>file size:<br>file type:<br>image width:<br>image height:";
                 
             })
             .catch(error => {

@@ -137,11 +137,9 @@ pre::-webkit-scrollbar {
     width: 100px;
 }
 
-/* #metadata{
-    display: flex;
-    flex-wrap: wrap;
-    font-size: 13px;
-} */
+.metadata{
+    font-size: 10px;
+}
 
 
 
@@ -662,7 +660,6 @@ input[type=number]::-webkit-outer-spin-button {
     left: 0;
     top: 50%;
     transform: translateY(-50%);
-    /* square corners */
     min-width:90px;
     height: 31px; 
     font-weight: 700;
@@ -701,14 +698,13 @@ input[type=number]::-webkit-outer-spin-button {
     display: inline-block;
     position: relative;
     width: 90px; /* match other buttons */
-    height: 48px; /* space for top label + 30px track */
+    height: 48px;
     cursor: pointer;
     user-select: none;
     vertical-align: middle;
 }
 
-/* Top label that changes between Default and Custom via the checked state
-   Implemented as .customSpan::before but made visible above the track */
+
 .customLabel .customSpan::before {
     content: "Default";
     position: absolute;
@@ -719,7 +715,7 @@ input[type=number]::-webkit-outer-spin-button {
     transform: translateX(15%);
     font-size: 12px;
     font-weight: 700;
-    color: #ffffff; /* white text so it stands out */
+    color: #ffffff; 
     z-index: 6;
     pointer-events: none;
 }
@@ -729,7 +725,7 @@ input[type=number]::-webkit-outer-spin-button {
 .customLabel .customSpan {
     display: block;
     width: 100%;
-    height: 30px; /* track height to match other buttons */
+    height: 30px; 
     background-color: #585858;
     border-radius: 0;
     position: absolute;
@@ -744,7 +740,7 @@ input[type=number]::-webkit-outer-spin-button {
     line-height: 10px;
 }
 
-/* Knob (square) */
+
 .customLabel .customSpan::after {
     content: "";
     position: absolute;
@@ -773,7 +769,6 @@ input[type=number]::-webkit-outer-spin-button {
     transform: translateX(-15%);
 }
 
-/* keep small padding for alignment when used inline */
 .customSpan {
     padding-left: 0;
     vertical-align: middle;
