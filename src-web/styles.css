@@ -568,7 +568,7 @@ input[type=number]::-webkit-outer-spin-button {
     text-align: center;
     white-space: nowrap;           
     overflow: hidden;               
-    text-overflow: ellipsis;     
+    text-overflow: ellipsis;        /* clip with ellipsis if needed */
     max-width: 100%;
     box-sizing: border-box;
 }
@@ -712,16 +712,18 @@ input[type=number]::-webkit-outer-spin-button {
 .customLabel .customSpan::before {
     content: "Default";
     position: absolute;
-    top: -18px; /* place above the toggle */
+    top: 10px; /* place above the toggle */
     left: 0;
     width: 100%;
     text-align: center;
-    font-size: 16px;
+    transform: translateX(15%);
+    font-size: 12px;
     font-weight: 700;
     color: #ffffff; /* white text so it stands out */
     z-index: 6;
     pointer-events: none;
 }
+
 
 /* The visible track (no border radius) */
 .customLabel .customSpan {
@@ -768,6 +770,7 @@ input[type=number]::-webkit-outer-spin-button {
 .customLabel input[type="checkbox"]:checked + .customSpan::before {
     content: "Custom";
     color: #ffffff; /* ensure white when checked */
+    transform: translateX(-15%);
 }
 
 /* keep small padding for alignment when used inline */
